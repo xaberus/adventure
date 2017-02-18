@@ -85,20 +85,20 @@ class Room(Object):
     def find(self, idn):
         return self.object_map[idn]
 
-    def interact(self, nar, action, target=None):
+    def interact(self, action, target=None):
         if target is None:
-            super().interact(nar, action)
+            super().interact(action)
             return
 
         #target = self.parse(target)
-        #target.interact(nar, action)
+        #target.interact(self.nar, action)
         raise RuntimeError('not implemented yet')
 
-    def look(self, nar, data):
+    def look(self, data):
         data['objects'] = {}
         data['doors'] = {
             door.pred.point_in_room(self): door
             for door in self.doors.values()
         }
-        self.look_replies.narrate(nar, data)
-        self.common_replies.narrate(nar, data)
+        self.look_replies.narrate(self.nar, data)
+        self.common_replies.narrate(self.nar, data)

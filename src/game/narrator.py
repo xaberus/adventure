@@ -5,7 +5,7 @@ Created on Sat Feb 11 22:22:40 2017
 @author: xa
 """
 
-import jinja2
+import re
 import game.verb
 import game.action
 from game.environment import env
@@ -14,7 +14,10 @@ from game.reply import Reply, RandomReply
 
 class Narrator:
     def __init__(self):
-        self.narratives = {}
+        self.state = {}
+        self.state['@narratives'] = {}
+        self.narratives = self.state['@narratives']
+        
         self.env = env
         self.room = None
 
@@ -110,7 +113,7 @@ class Narrator:
             verb, target = t
             action = game.action.actions[verb.base]
 
-            target.interact(self, action)
+            target.interact(action)
 
     def say(self, msg):
         if len(msg) > 0:
@@ -128,3 +131,13 @@ class Narrator:
         if narrative_id not in self.narratives:
             self.narratives[narrative_id] = {}
         return self.narratives[narrative_id]
+    
+    def require_uid_state(self, uid):
+        m = re.match('[a-z0-9_]+', uid)
+        if m is None:
+            raise KeyError('malformed uid')
+            
+        if uid not in self.state:
+            self.state[uid] = {}
+        
+        return self.state[uid]

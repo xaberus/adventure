@@ -12,11 +12,10 @@ from game.reply import Reply, NarrativeReply
 class Door(Object):
     def __init__(self, *args, state=None, **kwargs):
         super().__init__(*args, **kwargs)
-
+        
         if state is None:
             state = 'closed'
-
-        self.state = state
+        self.state['door'] = state
 
         # open
         self.open_closed_replies = Reply([
@@ -82,33 +81,36 @@ class Door(Object):
     def descibe(self):
         return 'Just a simple door.'
 
-    def open(self, nar, data):
-        if self.state == 'closed':
-            self.open_closed_replies.say(nar, data)
-            self.state = 'open'
-        elif self.state == 'open':
-            self.open_open_replies.say(nar, data)
-        elif self.state == 'locked':
-            self.open_locked_replies.say(nar, data)
-        elif self.state == 'jammed':
-            self.jammed_replies.say(nar, data)
+    def open(self, data):
+        state = self.state['door']
+        if state == 'closed':
+            self.open_closed_replies.say(self.nar, data)
+            state = 'open'
+        elif state == 'open':
+            self.open_open_replies.say(self.nar, data)
+        elif state == 'locked':
+            self.open_locked_replies.say(self.nar, data)
+        elif state == 'jammed':
+            self.jammed_replies.say(self.nar, data)
 
-    def close(self, nar, data):
-        if self.state == 'open':
-            self.close_open_replies.say(nar, data)
-            self.state = 'closed'
-        elif self.state == 'closed':
-            self.close_closed_replies.say(nar, data)
-        elif self.state == 'locked':
-            self.close_locked_replies.say(nar, data)
-        elif self.state == 'jammed':
-            self.jammed_replies.say(nar, data)
+    def close(self, data):
+        state = self.state['door']
+        if state == 'open':
+            self.close_open_replies.say(self.nar, data)
+            state = 'closed'
+        elif state == 'closed':
+            self.close_closed_replies.say(self.nar, data)
+        elif state == 'locked':
+            self.close_locked_replies.say(self.nar, data)
+        elif state == 'jammed':
+            self.jammed_replies.say(self.nar, data)
 
-    def look(self, nar, data):
-        if self.state == 'open':
-            self.look_open_replies.narrate(nar, data)
-        elif self.state in ('closed', 'locked', 'jammed'):
-            self.look_closed_replies.narrate(nar, data)
+    def look(self, data):
+        state = self.state['door']
+        if state == 'open':
+            self.look_open_replies.narrate(self.nar, data)
+        elif state in ('closed', 'locked', 'jammed'):
+            self.look_closed_replies.narrate(self.nar, data)
 
 
 class MetalDoor(Door):
@@ -132,5 +134,5 @@ class MetalDoor(Door):
     def short_name(self):
         return 'door'
 
-    def touch(self, nar, data):
-        self.touch_replies.narrate(nar, data)
+    def touch(self, data):
+        self.touch_replies.narrate(self.nar, data)

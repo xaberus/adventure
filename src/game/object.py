@@ -9,7 +9,10 @@ from game.reply import RandomReply
 
 
 class Object:
-    def __init__(self, pred=None):
+    def __init__(self, nar, uid, pred=None):
+        self.nar = nar
+        self.uid = uid
+        self.state = self.nar.require_uid_state(self.uid)
         self.actions = {}
         self.pred = pred
 
@@ -33,7 +36,7 @@ class Object:
     def short_name(self):
         return self.name()
 
-    def interact(self, nar, action):
+    def interact(self, action):
         data = {
             'action': action,
             'verb': action.verb,
@@ -42,6 +45,6 @@ class Object:
 
         base = action.base
         if base not in self.actions:
-            self.unknown_replies.say(nar, data)
+            self.unknown_replies.say(data)
         else:
-            self.actions[base](nar, data)
+            self.actions[base](data)
