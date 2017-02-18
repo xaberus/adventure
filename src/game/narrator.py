@@ -28,13 +28,12 @@ class Narrator:
             '{% endfor %}'
             ' in the {{ room | predobj }}.'
             ' Did you mean{% for target in targets[:-1] %}'
-            ' the'
-            ' {{ target| predobj }}'
+            ' {{ target| predobj }}{% if not loop.last %},{% endif %}'
             '{%endfor%}'
             '{% for target in targets[-1:] %}'
-            ' or the'
+            ' or'
             ' {{ target| predobj }}'
-            '{%endfor%}'
+            '{%endfor%}.'
         ])
 
         self.no_target_reply = Reply([
@@ -43,13 +42,13 @@ class Narrator:
         ])
 
         self.target_not_found_reply = RandomReply([
-            'You tried to {{ verb| inf }} {{ verb | prep }} the'
+            'You tried to {{ verb| inf }} the'
             '{% for token in tokens %}'
             ' {{ token | upper }}'
             '{% endfor %}'
             '. It was not there. You cried in desperation.',
             'In your head'
-            ' {{ verb| inf }} {{ verb | prep }} the'
+            ' {{ verb | ing }} the'
             '{% for token in tokens %}'
             ' {{ token | upper }}'
             '{% endfor %}'

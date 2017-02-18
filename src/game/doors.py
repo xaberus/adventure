@@ -85,7 +85,7 @@ class Door(Object):
         state = self.state['door']
         if state == 'closed':
             self.open_closed_replies.say(self.nar, data)
-            state = 'open'
+            self.state['door'] = 'open'
         elif state == 'open':
             self.open_open_replies.say(self.nar, data)
         elif state == 'locked':
@@ -97,7 +97,7 @@ class Door(Object):
         state = self.state['door']
         if state == 'open':
             self.close_open_replies.say(self.nar, data)
-            state = 'closed'
+            self.state['door'] = 'closed'
         elif state == 'closed':
             self.close_closed_replies.say(self.nar, data)
         elif state == 'locked':

@@ -48,7 +48,10 @@ def predobj_filter(obj):
     pred = obj.pred
     if pred is not None:
         pred = pred.name()
-        return ('{} {}'.format(pred, obj.name())).upper()
+        if obj.proper_name():
+            return ('{} {}'.format(pred, obj.name())).upper()
+        else:
+            return ('the {} {}'.format(pred, obj.name())).upper()
     else:
         return obj.name().upper()
 env.filters['predobj'] = predobj_filter

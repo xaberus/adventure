@@ -33,7 +33,7 @@ class Room(Object):
             '<common>'
             '{% endif %}'
             '{% if doors | length > 0 %}{% for pos, door in doors.items() %}'
-            '\n  {{ pos }} of the {{ object | obj }}'
+            '\n  {{ pos }}'
             ' you saw {{ door | obj | a }}'
             ' {{ door | obj }}'
             '{% endfor %}{% endif %}'
@@ -60,6 +60,8 @@ class Room(Object):
         for o in self.objects.values():
             idn = tuple(o.name().split())
             collect(self.object_map, idn, o)
+            idn = tuple(o.short_name().split())
+            collect(self.object_map, idn, o)
 
         for pos, d in self.doors.items():
             idn = tuple(d.name().split())
@@ -74,8 +76,8 @@ class Room(Object):
     def name(self):
         return 'room'
 
-    def add_object(self, o_id, o):
-        self.objects[o_id] = o
+    def add_object(self, o):
+        self.objects[o.uid] = o
         self._register_objects()
 
     def add_door(self, d):

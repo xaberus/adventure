@@ -5,7 +5,7 @@ Created on Sat Feb 11 22:28:42 2017
 @author: xa
 """
 
-from game.reply import RandomReply
+from game.reply import Reply, RandomReply
 
 
 class Object:
@@ -26,6 +26,9 @@ class Object:
             ' the {{ object | obj }}'
             ' made no sense to you.'
         ])
+    
+    def proper_name(self):
+        return False
 
     def name(self):
         return 'object'
@@ -45,6 +48,10 @@ class Object:
 
         base = action.base
         if base not in self.actions:
-            self.unknown_replies.say(data)
+            self.unknown_replies.say(self.nar, data)
         else:
-            self.actions[base](data)
+            act = self.actions[base]
+            if isinstance(act, Reply):
+                act.say(self.nar, data)
+            else:
+                act(data)
