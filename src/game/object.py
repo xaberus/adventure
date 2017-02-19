@@ -16,36 +16,37 @@ class InvalidInteraction(Exception):
 
 
 class Object:
+    unknown_replies = RandomReply([
+        'You did not knew how to {{ action | inf }}'
+        ' {{ object | predobj }}'
+        '{% if item %}'
+        '{% if action | xprep %} {{ action | xprep }}{% endif %}'
+        ' {{ item | predobj }}'
+        '{% endif %}'
+        '.',
+        'You contemplated {{ action | ing }}'
+        ' the {{ object | obj }}'
+        '{% if item %}'
+        '{% if action | xprep %} {{ action | xprep }}{% endif %}'
+        ' {{ item | predobj }}'
+        '{% endif %},'
+        ' but you quickly changed your mind.',
+        'At that point in time {{ action | ing }}'
+        ' {{ object | predobj }}'
+        '{% if item %}'
+        '{% if action | xprep %} {{ action | xprep }}{% endif %}'
+        ' {{ item | predobj }}'
+        '{% endif %}'
+        ' made no sense to you.'
+    ])
+
     def __init__(self, nar, uid, pred=None):
         self.nar = nar
         self.uid = uid
         self.state = self.nar.require_uid_state(self.uid)
         self.actions = {}
         self.pred = pred
-
-        self.unknown_replies = RandomReply([
-            'You did not knew how to {{ verb | inf }}'
-            ' {{ object | predobj }}'
-            '{% if item %}'
-            '{% if verb | xprep %} {{ verb | xprep }}{% endif %}'
-            ' {{ item | predobj }}'
-            '{% endif %}'
-            '.',
-            'You contemplated {{ verb | ing }}'
-            ' the {{ object | obj }}'
-            '{% if item %}'
-            '{% if verb | xprep %} {{ verb | xprep }}{% endif %}'
-            ' {{ item | predobj }}'
-            '{% endif %},'
-            ' but you quickly changed your mind.',
-            'At that point in time {{ verb | ing }}'
-            ' {{ object | predobj }}'
-            '{% if item %}'
-            '{% if verb | xprep %} {{ verb | xprep }}{% endif %}'
-            ' {{ item | predobj }}'
-            '{% endif %}'
-            ' made no sense to you.'
-        ])
+        self.parent = None
 
     def proper_name(self):
         return False
@@ -53,29 +54,41 @@ class Object:
     def name(self):
         return 'object'
 
-    def __repr__(self):
-        return '<{}>'.format(self.name())
-
     def short_name(self):
         return self.name()
 
-    def interact(self, action, item=None):
+    def __repr__(self):
+        n = self.name()
+        sn = self.short_name()
+        if n != sn:
+            return '<{} a.k.a. {}>'.format(sn, n)
+        else:
+            return '<{}>'.format(sn, n)
+
+    def set_parent(self, parent):
+        if self.parent is not None:
+            self.parent.remove_object(self)
+        self.parent = parent
+
+    def interact(self, action):
         data = {
             'action': action,
-            'verb': action.verb,
             'object': self,
-            'item': item,
+            'item': action.predicate,
         }
 
         base = action.base
         if base not in self.actions:
-            self.unknown_replies.say(self.nar, data)
+            raise self.unknown_replies.complain(data)
         else:
             act = self.actions[base]
             if isinstance(act, Reply):
-                act.say(self.nar, data)
+                raise act.say(data)
             else:
-                act(data)
+                try:
+                    act(data)
+                except InvalidInteraction as e:
+                    raise self.unknown_replies.complain(data)
 
 
 class Container():
@@ -103,8 +116,24 @@ class Container():
         return self.objects.__len__()
 
     def __getitem__(self, key):
-        return self.map.__getitem__(key)
+        return self.objects.__getitem__(key)
+
+    def __missing__(self, key):
+        return self.objects.__missing__(key)
+
+    def __iter__(self):
+        return self.objects.__iter__()
+
+    def find(self, idn):
+        return self.map[idn]
 
     def add(self, obj):
         self.objects[obj.uid] = obj
         self._register_objects()
+
+    def pop(self, obj):
+        self.objects.pop(obj.uid)
+        self._register_objects()
+
+    def values(self):
+        return self.objects.values()

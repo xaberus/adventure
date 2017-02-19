@@ -9,10 +9,9 @@ import collections
 from game.util import collect
 
 verbs = {}
-xverbs = {}
 
 
-class XVerb:
+class Verb:
     def infinitive_form(self):
         return self.base
 
@@ -37,7 +36,7 @@ class XVerb:
             return out
 
     def present_continuous_tense(self, negate, form):
-        aux_verb = xverbs['be']
+        aux_verb = verbs['be']
         out = aux_verb.present_tense(negate, form)
         if negate:
             return '{} not {}'.format(out, self.ing_form())
@@ -45,7 +44,7 @@ class XVerb:
             return '{} {}'.format(out, self.ing_form())
 
     def present_perfect_tense(self, negate, form):
-        aux_verb = xverbs['have']
+        aux_verb = verbs['have']
         out = aux_verb.present_tense(negate, form)
         if negate:
             return '{} not {}'.format(out, self.participle_form())
@@ -53,8 +52,8 @@ class XVerb:
             return '{} {}'.format(out, self.participle_form())
 
     def present_perfect_continuous_tense(self, negate, form):
-        aux_verb = xverbs['have']
-        aux_part = xverbs['be'].participle_form()
+        aux_verb = verbs['have']
+        aux_part = verbs['be'].participle_form()
         out = aux_verb.present_tense(negate, form)
         if negate:
             return '{} {} not {}'.format(out, aux_part, self.ing_form())
@@ -68,7 +67,7 @@ class XVerb:
             return self.past_form(form)
 
     def past_continuous_tense(self, negate, form):
-        aux_verb = xverbs['be']
+        aux_verb = verbs['be']
         out = aux_verb.past_form(form)
         if negate:
             return '{} not {}'.format(out,  self.ing_form())
@@ -76,7 +75,7 @@ class XVerb:
             return '{} {}'.format(out,  self.ing_form())
 
     def past_perfect_tense(self, negate, form):
-        aux_verb = xverbs['have']
+        aux_verb = verbs['have']
         out = aux_verb.past_form(form)
         if negate:
             return '{} not {}'.format(out,  self.participle_form())
@@ -84,8 +83,8 @@ class XVerb:
             return '{} {}'.format(out,  self.participle_form())
 
     def past_perfect_continuous_tense(self, negate, form):
-        aux_verb = xverbs['have']
-        aux_part = xverbs['be'].participle_form()
+        aux_verb = verbs['have']
+        aux_part = verbs['be'].participle_form()
         out = aux_verb.past_tense(negate, form)
         if negate:
             return '{} {} not {}'.format(out, aux_part, self.ing_form())
@@ -99,7 +98,7 @@ class XVerb:
             return 'will {}'.format(self.infinitive_form())
 
     def future_continuous_tense(self, negate, form):
-        aux_verb = xverbs['be']
+        aux_verb = verbs['be']
         out = aux_verb.infinitive_form()
         if negate:
             return 'will not {} {}'.format(out, self.ing_form())
@@ -107,7 +106,7 @@ class XVerb:
             return 'will {} {}'.format(out, self.ing_form())
 
     def future_perfect_tense(self, negate, form):
-        aux_verb = xverbs['have']
+        aux_verb = verbs['have']
         out = aux_verb.infinitive_form()
         if negate:
             return 'will not {} {}'.format(out, self.participle_form())
@@ -115,8 +114,8 @@ class XVerb:
             return 'will {} {}'.format(out, self.participle_form())
 
     def future_perfect_continuous_tense(self, negate, form):
-        aux_verb = xverbs['have']
-        aux_part = xverbs['be'].participle_form()
+        aux_verb = verbs['have']
+        aux_part = verbs['be'].participle_form()
         out = aux_verb.infinitive_form()
         if negate:
             return 'will not {} {} {}'.format(out, aux_part,
@@ -132,7 +131,7 @@ class XVerb:
             return 'would {}'.format(self.infinitive_form())
 
     def conditional_perfect_tense(self, negate, form):
-        aux_verb = xverbs['have']
+        aux_verb = verbs['have']
         out = aux_verb.infinitive_form()
         if negate:
             return 'would not {} {}'.format(out, self.participle_form())
@@ -146,7 +145,7 @@ class XVerb:
         return []
 
 
-class XBe(XVerb):
+class Be(Verb):
     base = 'be'
     present_map = {
         '1sng': 'am',
@@ -180,10 +179,10 @@ class XBe(XVerb):
         else:
             return self.present_map[form]
 
-xverbs['be'] = XBe()
+verbs['be'] = Be()
 
 
-class XHave(XVerb):
+class Have(Verb):
     base = 'have'
     present_map = {
         '1sng': 'have',
@@ -209,10 +208,10 @@ class XHave(XVerb):
         else:
             return self.present_map[form]
 
-xverbs['have'] = XHave()
+verbs['have'] = Have()
 
 
-class XDo(XVerb):
+class Do(Verb):
     base = 'do'
 
     def past_form(self, form):
@@ -231,31 +230,64 @@ class XDo(XVerb):
         else:
             return out
 
-xverbs['do'] = XDo()
+verbs['do'] = Do()
 
 
-class XPlay(XVerb):
+class Play(Verb):
     base = 'play'
 
-xverbs['play'] = XPlay()
+    def local_prepositions(self):
+        return ['with']
+
+verbs['play'] = Play()
 
 
-class XUse(XVerb):
+class Use(Verb):
     base = 'use'
 
     def ing_form(self):
         return 'using'
 
-xverbs['use'] = XUse()
+    def far_prepositions(self):
+        return ['with', 'at', 'and']
+
+verbs['use'] = Use()
 
 
-class XLook(XVerb):
+class Combine(Verb):
+    base = 'combine'
+
+    def ing_form(self):
+        return 'combining'
+
+    def far_prepositions(self):
+        return ['with', 'and']
+
+verbs['combine'] = Combine()
+
+
+class Give(Verb):
+    base = 'give'
+
+    def ing_form(self):
+        return 'giving'
+
+    def far_prepositions(self):
+        return ['to']
+
+verbs['give'] = Give()
+
+
+class Look(Verb):
     base = 'look'
 
-xverbs['look'] = XLook()
+    def local_prepositions(self):
+        return ['at', 'behind']
+
+verbs['look'] = Look()
 
 
-class XBehold(XVerb):
+class Behold(Verb):
     base = 'behold'
 
     def past_form(self, form):
@@ -264,22 +296,22 @@ class XBehold(XVerb):
     def participle_form(self):
         return 'beheld'
 
-xverbs['behold'] = XBehold()
+verbs['behold'] = Behold()
 
 
-class XOpen(XVerb):
+class Open(Verb):
     base = 'open'
 
-xverbs['open'] = XOpen()
+verbs['open'] = Open()
 
 
-class XClose(XVerb):
+class Close(Verb):
     base = 'close'
 
-xverbs['close'] = XClose()
+verbs['close'] = Close()
 
 
-class XTake(XVerb):
+class Take(Verb):
     base = 'take'
 
     def past_form(self, form):
@@ -288,10 +320,13 @@ class XTake(XVerb):
     def participle_form(self):
         return 'taken'
 
-xverbs['take'] = XTake()
+    def far_prepositions(self):
+        return ['to']
+
+verbs['take'] = Take()
 
 
-class XGo(XVerb):
+class Go(Verb):
     base = 'go'
 
     def past_form(self, form):
@@ -300,10 +335,13 @@ class XGo(XVerb):
     def participle_form(self):
         return 'gone'
 
-xverbs['go'] = XGo()
+    def local_prepositions(self):
+        return ['to']
+
+verbs['go'] = Go()
 
 
-class XSpeak(XVerb):
+class Speak(Verb):
     base = 'speak'
 
     def past_form(self, form):
@@ -312,113 +350,32 @@ class XSpeak(XVerb):
     def participle_form(self):
         return 'spoken'
 
-xverbs['speak'] = XSpeak()
+    def local_prepositions(self):
+        return ['with']
+
+    def far_prepositions(self):
+        return ['about']
+
+verbs['speak'] = Speak()
 
 
-class XTalk(XVerb):
+class Talk(Verb):
     base = 'talk'
 
-xverbs['talk'] = XSpeak()
+    def local_prepositions(self):
+        return ['to']
+
+verbs['talk'] = Talk()
 
 
-class XTouch(XVerb):
+class Touch(Verb):
     base = 'touch'
 
-xverbs['touch'] = XTouch()
+verbs['touch'] = Touch()
 
-########################################
-########################################
-
-
-class Verb:
-    preposition = None
-
-    def infinitive(self):
-        pass
-
-    def past(self):
-        pass
-
-    def participle(self):
-        pass
-
-    def ing(self):
-        out = self.infinitive()
-        if out not in ['use']:
-            return out + 'ing'
-        else:
-            return out[:-1] + 'ing'
-
-    def preposition(self):
-        return self.prep
-
-    def extra_prepositions(self):
-        return self.xprep
-
-
-# verb forms
-class RegularVerb(Verb):
-    def __init__(self, base, prep=None, xprep=None):
-        self.base = base
-        self.prep = prep
-        self.xprep = xprep
-
-    def infinitive(self):
-        return self.base
-
-    def past(self):
-        if self.base[-1] != 'e':
-            return self.base + 'ed'
-        else:
-            return self.base + 'd'
-
-    def participle(self):
-        if self.base[-1] != 'e':
-            return self.base + 'ed'
-        else:
-            return self.base + 'd'
-
-
-class IrregularVerb(Verb):
-    def __init__(self, base, past, participle, prep=None, xprep=None):
-        self.base = base
-        self.prep = prep
-        self.xprep = xprep
-        self.past_form = past
-        self.participle_form = participle
-
-    def infinitive(self):
-        return self.base
-
-    def past(self):
-        return self.past_form
-
-    def participle(self):
-        return self.participle_form
-
-
-def _define_verb(base, past=None, participle=None, **kwargs):
-    if past is None and participle is None:
-        verbs[base] = RegularVerb(base, **kwargs)
-    else:
-        verbs[base] = IrregularVerb(base, past, participle, **kwargs)
-
-_define_verb('look', prep='at')
-_define_verb('behold', 'beheld', 'beheld')
-_define_verb('use', xprep=['with', 'on', 'and'])
-_define_verb('open')
-_define_verb('close')
-# _define_verb('cook')
-_define_verb('take', 'took', 'taken')
-_define_verb('take', 'took', 'taken')
-_define_verb('go', 'went', 'gone')
-_define_verb('speak', 'spoke', 'spoken', prep='with')
-_define_verb('talk', prep='to')
-_define_verb('touch')
-# _define_verb('ring', 'rang', 'rung')
 
 if __name__ == '__main__':
-    verb = xverbs['use']
+    verb = verbs['look']
 
     todo = [
         ('I', '1sng'),

@@ -13,20 +13,20 @@ env = jinja2.Environment()
 
 
 def inf_filter(verb):
-    p = verb.preposition()
-    out = verb.infinitive()
-    if p is not None:
-        out = '{} {}'.format(out, p)
+    p = verb.local_prepositions()
+    out = verb.infinitive_form()
+    if len(p) > 0:
+        out = '{} {}'.format(out, p[0])
     return out.upper()
 env.filters['inf'] = inf_filter
 
 
 def ing_filter(verb):
-    p = verb.preposition()
-    out = verb.ing()
+    p = verb.local_prepositions()
+    out = verb.ing_form()
 
-    if p is not None:
-        out = '{} {}'.format(out, p)
+    if len(p) > 0:
+        out = '{} {}'.format(out, p[0])
     return out.upper()
 env.filters['ing'] = ing_filter
 
@@ -34,19 +34,20 @@ env.filters['ing'] = ing_filter
 def prep_filter(verb):
     return verb.preposition()
 env.filters['prep'] = prep_filter
-           
+
+
 def xprep_filter(verb):
-    xprep = verb.extra_prepositions()
-    if xprep is not None:
-        return xprep[0].upper()
+    p = verb.far_prepositions()
+    if len(p) > 0:
+        return p[0].upper()
 env.filters['xprep'] = xprep_filter
 
 
-def past_filter(verb):
-    p = verb.preposition()
-    out = verb.past()
-    if p is not None:
-        out = '{} {}'.format(out, p)
+def past_filter(verb, negate=False, form='1sng'):
+    p = verb.local_prepositions()
+    out = verb.past_tense(negate, form)
+    if len(p) > 0:
+        out = '{} {}'.format(out, p[0])
     return out.upper()
 env.filters['past'] = past_filter
 
@@ -81,6 +82,13 @@ def pred_filter(obj):
 env.filters['pred'] = pred_filter
 
 
+def point_filter(obj):
+    if obj.point_preposition is not None:
+        return obj.point_preposition.upper()
+    return 'in'.upper()
+env.filters['point'] = point_filter
+
+
 def a_filter(s):
     c = s[0]
     if c in ('a', 'e', 'i', 'o', 'u'):
@@ -88,3 +96,8 @@ def a_filter(s):
     else:
         return 'a'
 env.filters['a'] = a_filter
+
+
+def debug(*args, **kwargs):
+    # print(*args, **kwargs)
+    pass

@@ -11,6 +11,23 @@ import random
 from game.environment import env
 
 
+class NarratorMessage(Exception):
+    def __init__(self, message):
+        self.message = message
+
+
+class NarratorNarration(NarratorMessage):
+    pass
+
+
+class NarratorAnswer(NarratorMessage):
+    pass
+
+
+class NarratorComplaint(NarratorMessage):
+    pass
+
+
 class Reply:
     def __init__(self, variants):
         self.set_variants(variants)
@@ -22,27 +39,27 @@ class Reply:
         ]
         self.cycle = None
 
-    def choose_reply(self, nar, data):
+    def choose_reply(self, data):
         if self.cycle is None:
             self.cycle = itertools.cycle(self.variants)
 
         return next(self.cycle)
 
-    def say(self, nar, data):
-        v = self.choose_reply(nar, data)
-        nar.say(v.render(data))
+    def say(self, data):
+        v = self.choose_reply(data)
+        return NarratorAnswer(v.render(data))
 
-    def narrate(self, nar, data):
-        v = self.choose_reply(nar, data)
-        nar.narrate(v.render(data))
+    def narrate(self, data):
+        v = self.choose_reply(data)
+        return NarratorNarration(v.render(data))
 
-    def complain(self, nar, data):
-        v = self.choose_reply(nar, data)
-        nar.complain(v.render(data))
+    def complain(self, data):
+        v = self.choose_reply(data)
+        return NarratorComplaint(v.render(data))
 
 
 class RandomReply(Reply):
-    def choose_reply(self, nar, data):
+    def choose_reply(self, data):
         def picker():
             while True:
                 i = random.randint(0, len(self.variants) - 1)
@@ -54,7 +71,7 @@ class RandomReply(Reply):
 
 
 class NarrativeReply(Reply):
-    def __init__(self, narrative_id, variants, narrative):
+    def __init__(self, nar, narrative_id, variants, narrative):
         super().__init__(variants)
 
         self.narrative_id = narrative_id
@@ -62,11 +79,12 @@ class NarrativeReply(Reply):
             env.from_string(variant)
             for variant in narrative
         ]
+        self.narrate_state = nar.get_narrative(self.narrative_id)
+        self.narrate_state['told'] = False
 
-    def choose_reply(self, nar, data):
+    def choose_reply(self, data):
         if self.cycle is None:
-            n = nar.get_narrative(self.narrative_id)
-            if 'told' not in n:
+            if not self.narrate_state['told']:
                 self.cycle = itertools.chain(self.variants, self.narrative)
             else:
                 self.cycle = itertools.cycle(self.variants)
@@ -76,6 +94,5 @@ class NarrativeReply(Reply):
         except StopIteration:
             self.cycle = itertools.cycle(self.variants)
             v = next(self.cycle)
-            nar.get_narrative(self.narrative_id)['told'] = True
-
+            self.narrate_state['told'] = True
         return v
