@@ -74,11 +74,11 @@ class Rabbit(Object):
         ' your hand.',
         'You gave {{ item | predobj }} to {{ object | predobj }}.'
         ' Silently you remarked something about order not having'
-        ' particular a meaning.'
+        ' a particular meaning.'
     ])
     combine_carrot_fed_replies = Reply([
         'You almost gave the {{ item | predobj }} to {{ object | predobj }},'
-        ' but you felt a hungy stare lasting on you.'
+        ' but a hungry stare stopped you.'
     ])
     combine_else_replies = Reply([
         '{{ object | predobj }} showed no interest'

@@ -41,7 +41,7 @@ class Inventory(Room):
     ])
 
     inventory_replies = Reply([
-        'You took a look at {{ object | predobj }}:'
+        'You took a look at {{ object | obj }}:'
         '\n\n'
         '{% for item in objects %}'
         '  {{ item | predobj }}'
