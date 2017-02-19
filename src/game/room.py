@@ -6,8 +6,7 @@ Created on Sat Feb 11 22:25:01 2017
 """
 
 
-import collections
-from game.object import Object
+from game.object import Object, Container
 from game.reply import Reply
 
 
@@ -24,8 +23,8 @@ class Room(Object):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.objects = collections.OrderedDict()
-        self.doors = collections.OrderedDict()
+        self.objects = Container([self])
+        self.doors = Container()
         self.object_map = {}
 
         self.common = (
@@ -48,44 +47,20 @@ class Room(Object):
 
         self.actions['look'] = self.look
 
-    def _register_objects(self):
-        self.object_map = {}
-
-        idn = tuple(self.name().split())
-        collect(self.object_map, idn,  self)
-
-        idn = tuple(self.short_name().split())
-        collect(self.object_map, idn,  self)
-
-        for o in self.objects.values():
-            idn = tuple(o.name().split())
-            collect(self.object_map, idn, o)
-            idn = tuple(o.short_name().split())
-            collect(self.object_map, idn, o)
-
-        for pos, d in self.doors.items():
-            idn = tuple(d.name().split())
-            collect(self.object_map, idn, d)
-            idn = tuple(d.short_name().split())
-            collect(self.object_map, idn, d)
-            idn = tuple([pos] + d.name().split())
-            collect(self.object_map, idn, d)
-            idn = tuple([pos] + d.short_name().split())
-            collect(self.object_map, idn, d)
-
     def name(self):
         return 'room'
 
     def add_object(self, o):
-        self.objects[o.uid] = o
-        self._register_objects()
+        self.objects.add(o)
 
     def add_door(self, d):
-        self.doors[d.pred.name()] = d
-        self._register_objects()
+        self.doors.add(d)
 
     def find(self, idn):
-        return self.object_map[idn]
+        try:
+            return self.objects[idn]
+        except KeyError:
+            return self.doors[idn]
 
     def interact(self, action, target=None):
         if target is None:

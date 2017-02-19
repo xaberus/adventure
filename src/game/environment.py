@@ -23,7 +23,8 @@ env.filters['inf'] = inf_filter
 
 def ing_filter(verb):
     p = verb.preposition()
-    out = verb.infinitive() + 'ing'
+    out = verb.ing()
+
     if p is not None:
         out = '{} {}'.format(out, p)
     return out.upper()
@@ -33,6 +34,12 @@ env.filters['ing'] = ing_filter
 def prep_filter(verb):
     return verb.preposition()
 env.filters['prep'] = prep_filter
+           
+def xprep_filter(verb):
+    xprep = verb.extra_prepositions()
+    if xprep is not None:
+        return xprep[0].upper()
+env.filters['xprep'] = xprep_filter
 
 
 def past_filter(verb):
@@ -53,7 +60,10 @@ def predobj_filter(obj):
         else:
             return ('the {} {}'.format(pred, obj.name())).upper()
     else:
-        return obj.name().upper()
+        if obj.proper_name():
+            return obj.name().upper()
+        else:
+            return ('the ' + obj.name()).upper()
 env.filters['predobj'] = predobj_filter
 
 

@@ -11,7 +11,6 @@ from game.doors import Door, MetalDoor
 from game.object import Object
 from game.reply import Reply
 from game.narrator import Narrator
-import game.action as action
 
 
 class Balkony(Room):
@@ -22,6 +21,22 @@ class Balkony(Room):
     def name(self):
         return 'balkony'
 
+
+class Carrot(Object):
+    def __init__(self, *args, name=None, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.look_replies = Reply([
+            'The {{ object | obj }} was fresh and looked tasty.'
+            ' At least if you were a hare or a rabbit.'
+        ])
+        self.actions['look'] = self.look_replies
+
+    def name(self):
+        return 'carrot'
+
+    def proper_name(self):
+        return False
 
 class Rabbit(Object):
     def __init__(self, *args, name=None, **kwargs):
@@ -75,14 +90,13 @@ if __name__ == '__main__':
     nar = Narrator()
 
     r = Balkony(nar, 'room001')
+    nar.inventory_add_object(Carrot(nar, 'carrot'))
     r.add_object(Rabbit(nar, 'bowser', name='bowser'))
     r.add_object(Rabbit(nar, 'cooper', name='cooper'))
-    r.add_door(Door(nar, 'door001', pred=Predicate('left')))
-    r.add_door(MetalDoor(nar, 'door002', pred=Predicate('right')))
-    r.add_door(MetalDoor(nar, 'door003', pred=Predicate('front')))
+    r.add_door(Door(nar, 'door003', pred=Predicate('left')))
     nar.enter(r)
 
-    nar.interact('behold')
+#    nar.interact('behold carrot')
 #    nar.interact('look')
 #
 #    nar.interact('behold left door')
@@ -90,15 +104,23 @@ if __name__ == '__main__':
 #    nar.interact('behold left door')
 #    nar.interact('behold left door')
 
-    nar.interact('look rabbits')
+#    nar.interact('look rabbits')
 
-    nar.interact('look door')
-    nar.interact('look rabbit')
-    nar.interact('touch bowser')
-    nar.interact('look bowser')
-    nar.require_uid_state('bowser')['rabbit'] = 'fed'
-    nar.interact('look bowser')
-    nar.interact('speak bowser')
+    nar.interact('foo')
+    nar.interact('look at car')
+
+    nar.interact('look at left door')
+    nar.interact('use left door')
+    nar.interact('use carrot with bowser')
+    
+#    nar.interact('look rabbit')
+#    nar.interact('touch bowser')
+#    nar.interact('look bowser')
+#    nar.require_uid_state('bowser')['rabbit'] = 'fed'
+#    nar.interact('look bowser')
+#    nar.interact('speak bowser')
+#
+#    nar.interact('use carrot on rabbit')
 
 #    nar.interact('speak left door')
 
