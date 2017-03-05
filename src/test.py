@@ -17,28 +17,9 @@ class Item(game.object.Object):
 
 class ItemReceiver(game.object.Object):
     def __init__(self, nar, uid, data):
-        keys = data.keys()
-
-        actions = []
-        activation_map = None
-
-        for key in keys:
-            if key.startswith('reply@'):
-                actions.append((key, data.pop(key)))
-            elif key.startswith('randomreply@'):
-                actions.append((key, data.pop(key)))
-            elif key == 'activation_map':
-                activation_map = data.pop(key)
-
         super().__init__(nar, uid, data)
 
-        self._arm = game.actionutils.ActionReplyMap(self._state,
-                                                    activation_map, self)
-
         self.objects = set()
-
-        for spec, reply_data in actions:
-            self._arm.add_action_reply(spec, reply_data)
 
     def add_object(self, o):
         o.set_parent(self, relocate=True)
@@ -46,18 +27,6 @@ class ItemReceiver(game.object.Object):
 
     def remove_object(self, obj):
         self.objects.remove(obj)
-
-    def interact(self, action):
-        data = {
-            'action': action,
-            'object': self,
-            'item': action.predicate,
-        }
-
-        try:
-            self._arm.handle_action(action, data)
-        except game.object.InvalidInteraction:
-            raise self.unknown_replies.complain(data)
 
 
 if __name__ == '__main__':

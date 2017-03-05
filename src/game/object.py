@@ -81,6 +81,17 @@ class Object:
         state = data.pop('state', None)
         self._state = self.nar.state().require_uid_state(self._uid, state)
 
+        activation_map = data.pop('activation_map', {})
+        self._arm = game.actionutils.ActionReplyMap(self._state,
+                                                    activation_map, self)
+
+        keys = data.keys()
+        for key in keys:
+            if key.startswith('reply@'):
+                self._arm.add_action_reply(key, data.pop(key))
+            elif key.startswith('randomreply@'):
+                self._arm.add_action_reply(key, data.pop(key))
+
         for key in data:
             raise TypeError('got an unexpected argument: {}'.format(key))
 
@@ -125,18 +136,10 @@ class Object:
             'item': action.predicate,
         }
 
-        base = action.base
-        if base not in self.actions:
+        try:
+            self._arm.handle_action(action, data)
+        except game.object.InvalidInteraction:
             raise self.unknown_replies.complain(data)
-        else:
-            act = self.actions[base]
-            if isinstance(act, Reply):
-                raise act.say(data)
-            else:
-                try:
-                    act(data)
-                except InvalidInteraction as e:
-                    raise self.unknown_replies.complain(data)
 
 
 class Container():
