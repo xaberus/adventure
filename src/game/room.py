@@ -122,12 +122,12 @@ class Room(Object):
 
         raise RuntimeError('not implemented yet')
 
-    def look(self, data):
+    def extra_data(self, data):
         data['description'] = self._description
-        data['objects'] = {}
+        # TODO: fill in dicovered objects
+        # data['objects'] = {}
         data['room'] = self
         data['doors'] = {
             door.location().point_to(data): door
             for door in self.doors.values()
         }
-        raise self.look_replies.narrate(data)

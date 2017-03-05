@@ -125,12 +125,17 @@ class Object:
         if relocate:
             self._location = self.parent.location()
 
+    def extra_data(self, data):
+        return
+
     def interact(self, action):
         data = {
             'action': action,
             'object': self,
             'item': action.predicate,
         }
+
+        self.extra_data(data)
 
         try:
             self._arm.handle_action(action, data)
@@ -203,3 +208,21 @@ def create(nar, uid, obj_or_dict):
         return cls(nar, uid, obj_or_dict)
     else:
         return obj_or_dict
+
+
+class Item(Object):
+    pass
+
+
+class ItemReceiver(Object):
+    def __init__(self, nar, uid, data):
+        super().__init__(nar, uid, data)
+
+        self.objects = set()
+
+    def add_object(self, o):
+        o.set_parent(self, relocate=True)
+        self.objects.add(o)
+
+    def remove_object(self, obj):
+        self.objects.remove(obj)

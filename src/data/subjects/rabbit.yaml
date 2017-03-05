@@ -45,10 +45,10 @@
     - "You {{ action | past | brk }} {{ object | namdefl | brk }}. You heared silence. You spoke with {{ object | kind | namindef | brk }}. What did you expect?"
     
   reply@pet[happy]:
-    - "Now you had {{ object | kind | namsimp | brk }} fur all over youself, but {{ object | kind | namdefl | brk }} was happy."
+    - "Now you had {{ object | kind | namsimp | brk }} fur all over yourself, but {{ object | kind | namdefl | brk }} was happy."
 
   reply@apply[fed]/fed:
-    - "You almost gave {{ item | namdefl | brk }} to {{ object | namdefl | brk }} but you could feel a hungry stare lasting on you."
+    - "You almost gave {{ item | namdefl | brk }} to {{ object | namdefl | brk }}, but you decided not to overfeed it."
     
   final|randomreply@apply[fed]/!fed:
     - "{{ object | namdefl | brk }} snatched {{ item | namdefl | brk }} from your hand."
