@@ -17,7 +17,7 @@
           noun:
             carrot
     happy:
-        action: pet
+      action: pet
 
   reply@touch:
     - "{{ object | namdefl }} was warm and fluffy to the {{ action | inf }}."
@@ -43,6 +43,9 @@
 
   reply@speak:
     - "You {{ action | past | brk }} {{ object | namdefl | brk }}. You heared silence. You spoke with {{ object | kind | namindef | brk }}. What did you expect?"
+    
+  reply@pet:
+    - "Now you had {{ object | kind | namsimp }} fur all over youself, but {{ object | kind | namdefl }} was happy."
 
   reply@combine:
     - "{{ object | namdefl | brk }} snatched {{ item | namdefl | brk }} from your hand."

@@ -7,6 +7,7 @@ Created on Sat Mar  4 23:41:51 2017
 
 import os
 import game
+from game.util import debug
 from pyparsing import infixNotation, opAssoc, Word, alphas
 
 
@@ -106,6 +107,7 @@ class ActionReplyMap:
         self._actions[action].append((expr, reply))
 
     def handle_action(self, action, data):
+        debug('[handle action]', action, self._state)
         if action not in self._actions:
             raise game.object.InvalidInteraction()
 
@@ -114,6 +116,15 @@ class ActionReplyMap:
             # print(self._state, expr, expr.eval(self._state))
             if expr.eval(self._state):
                 out.append(reply.text(data))
+
+        # check direct actions here
+        for tag, condition in self._activation_map.items():
+            if 'action' in condition:
+                if action == condition['action']:
+                    value = condition.get('value', True)
+                    self._state[tag] = value
+
+        debug('[handled action]', action, self._state)
         raise game.reply.NarratorAnswer(' '.join(out))
 
 
@@ -168,10 +179,10 @@ if __name__ == '__main__':
         look second rabbit
         look second rabbit
         pet second rabbit
+        pet first rabbit
     """
 
     for cmd in commands.split('\n'):
         nar.interact(cmd.strip())
 
     print(nar.state().current_room().dump())
-    print(nar.state().current_room().get_by_uid('bowser').name().variants())

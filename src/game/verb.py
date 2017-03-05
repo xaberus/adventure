@@ -374,6 +374,24 @@ class Touch(Verb):
 verbs['touch'] = Touch()
 
 
+class Pet(Verb):
+    base = 'pet'
+
+    def ing_form(self):
+        return 'petting'
+
+verbs['pet'] = Pet()
+
+
+class Fondle(Verb):
+    base = 'fondle'
+
+    def ing_form(self):
+        return 'fondling'
+
+verbs['fondle'] = Fondle()
+
+
 if __name__ == '__main__':
     verb = verbs['look']
 

@@ -30,6 +30,10 @@ class InvalidPreposition(Exception):
         touch
             interact with something
 
+        pet/fondle
+            pet soebody
+                pet rabbit
+
         ramble
             let the player say something
                 talk
@@ -122,6 +126,8 @@ actions_base_map = {
         'on': {None: 'ramble'},
     },
     'touch': {None: {None: 'touch'}},
+    'pet': {None: {None: 'pet'}},
+    'fondle': {None: {None: 'pet'}},
     'speak': {
         None: {None: 'ramble'},
         'with': {
