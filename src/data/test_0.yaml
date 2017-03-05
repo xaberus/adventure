@@ -1,64 +1,72 @@
-rooms:
+!Game
+  rooms:
     - !Room
-        class: Room
-        uid: balkony
-        name: !Name
-            is_proper: true
-            noun: balcony
-            predicates:
-                - {kind: compound, word: your}
+      class: Room
+      uid: balkony
+      name: !Name
+        is_proper: true
+        noun: balcony
+        predicates:
+          - {kind: compound, word: your}
+      location: !Location
+        name:
+          noun: balcony
+        point_to: "on {{ room | namdefl }}"
 
-        locations:
-            corner: !Location
-                name: !Name
-                    noun: corner
-            floor: !Location
-                name: !Name
-                    noun: floor
+      locations:
+        corner: !Location
+          name: !Name
+            noun: corner
+          point_to: "in a corner"
+        floor: !Location
+          name: !Name
+            noun: floor
+          point_to: "on the floor"
+        back: !Location
+          name: !Name
+            noun: floor
+          point_to: "in the back of {{ room | namdefl }}"
+            
+      objects:
+        - !include
+          path: subjects/rabbit.yaml
+          uid: bowser
+          name: !Name Bowser
+          location: corner
 
-        objects:
-            - !include
-                path: subjects/rabbit.yaml
-                uid: bowser
-                name: !Name Bowser
-                location: corner
+        - !include
+          path: subjects/rabbit.yaml
+          uid: cooper
+          name: !Name Cooper
+          location: corner
 
-            - !include
-                path: subjects/rabbit.yaml
-                uid: cooper
-                name: !Name Cooper
-                location: corner
+        - !include
+          path: objects/plant.yaml
+          location: floor
 
-            - !include
-                path: objects/plant.yaml
-                location: floor
+      doors:
+        - !include
+          path: doors/balcony_door.yaml
+          location: back
 
-        doors:
-            - !include
-                path: doors/balcony_door.yaml
-                name: !Name
-                    noun: door
-                    default_predicate: compound
-                    predicates:
-                        - {kind: compound, word: balcony}
 
-inventory:
-    - !include
-        path: objects/carrot.yaml
-        uid: carrot1
-        name: !Name
-            noun: carrot
-            predicates:
-              - {kind: adjective, word: stubby}
-              - {kind: adjective, word: second}
+  inventory: !Inventory
+      - !include
+          path: objects/carrot.yaml
+          uid: carrot1
+          name: !Name
+              noun: carrot
+              predicates:
+                - {kind: adjective, word: stubby}
+                - {kind: adjective, word: second}
 
-    - !include
-        path: objects/carrot.yaml
-        uid: carrot2
-        name: !Name
-            noun: carrot
-            predicates:
-              - {kind: adjective, word: long}
-              - {kind: adjective, word: first}
+      - !include
+          path: objects/carrot.yaml
+          uid: carrot2
+          name: !Name
+              noun: carrot
+              predicates:
+                - {kind: adjective, word: long}
+                - {kind: adjective, word: first}
 
-current_room: balcony
+  current_room: balcony

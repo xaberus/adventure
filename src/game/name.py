@@ -205,7 +205,7 @@ def create(data):
     if not isinstance(data, dict):
         return data
 
-    debug('[load name]', data)
+    # debug('[load name]', data)
 
     default_pred = data.pop('default_predicate', None)
     pred_data = data.pop('predicates', None)

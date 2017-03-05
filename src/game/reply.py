@@ -79,7 +79,7 @@ class NarrativeReply(Reply):
             env.from_string(variant)
             for variant in narrative
         ]
-        self.narrate_state = nar.get_narrative(self.narrative_id)
+        self.narrate_state = nar.state().get_narrative(self.narrative_id)
         self.narrate_state['told'] = False
 
     def choose_reply(self, data):

@@ -10,7 +10,7 @@
     received: false
 
   activate_on:
-    name:
+    name: !Name
       noun:
         carrot
 

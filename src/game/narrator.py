@@ -13,15 +13,13 @@ import game.verb
 import game.dictionary
 import game.registry
 
-from game.name import ObjectName
 from game.action import InvalidPreposition, Action
 from game.environment import env
 from game.util import debug
 from game.object import InvalidInteraction
 from game.reply import Reply, RandomReply
 from game.reply import NarratorAnswer, NarratorNarration, NarratorComplaint
-from game.room import Room
-from game.location import Location
+from game.inventory import Inventory
 
 
 def ordered_load(stream):
@@ -55,50 +53,8 @@ class TargetNotUnique(Exception):
         self.target = target
 
 
-class Inventory(Room):
-
-    inventory_empty_replies = Reply([
-        '{{ object | namdefl }} was empty.'
-    ])
-
-    inventory_replies = Reply([
-        'You took a look in {{ object | namdefl }}:'
-        '\n\n'
-        '{% for item in objects %}'
-        '  {{ item | namdefl }}'
-        '{% if not loop.last %}\n{% endif %}'
-        '{% endfor %}'
-    ])
-
-    def __init__(self, nar, uid, **kwargs):
-        name = ObjectName(game.dictionary.nouns['inventory'])
-        kwargs['name'] = name
-        kwargs['location'] = Location(name=name, point_to="in your inventory")
-        super().__init__(nar, uid, **kwargs)
-
-        self.actions['look'] = self.look
-
-    def __repr__(self):
-        out = []
-        for item in self.objects:
-            out.append(str(item))
-        return '<inventory [{}]>'.format(', '.join(out))
-
-    def look(self, data):
-        if len(self.objects) == 0:
-            raise self.inventory_empty_replies.say(data)
-
-        data['objects'] = self.objects.values()
-
-        raise self.inventory_replies.say(data)
-
-
 class Narrator:
     def __init__(self):
-        self.state = {}
-        self.state['@narratives'] = {}
-        self.narratives = self.state['@narratives']
-        self.inventory = Inventory(self, 'inventory')
         self.actions = {}
 
         self.rooms = {}
@@ -169,6 +125,12 @@ class Narrator:
 
         self.actions['use'] = self.parse_complex_action
         self.actions['give'] = self.parse_complex_action
+
+    def set_state(self, state):
+        self._state = state
+
+    def state(self):
+        return self._state
 
     def enter(self, room):
         debug('[enter]', room)
@@ -349,53 +311,4 @@ class Narrator:
         if len(msg) > 0:
             print('{complaining} ' + msg)
 
-    def get_narrative(self, narrative_id):
-        if narrative_id not in self.narratives:
-            self.narratives[narrative_id] = {}
-        return self.narratives[narrative_id]
 
-    def require_uid_state(self, uid, state):
-        if state is None:
-            state = {}
-
-        m = re.match('[a-z0-9_]+', uid)
-        if m is None:
-            raise KeyError('malformed uid {}'.format(uid))
-
-        if uid not in self.state:
-            self.state[uid] = state
-
-        return self.state[uid]
-
-    def inventory_add_object(self, obj):
-        self.inventory.add_object(obj)
-
-    def load(self, file_name):
-        data_dir = os.path.dirname(__file__)
-        level_path = os.path.join(data_dir,
-                                  '..',
-                                  'data',
-                                  file_name)
-
-        data = ordered_load(open(level_path, 'r'))
-
-        rooms_data = data['rooms']
-        for room_uid, room_data in rooms_data.items():
-            room = game.object.create(self, room_uid, room_data)
-            self.rooms[room_uid] = room
-
-        inventory_data = data['inventory']
-        inventory = game.location.create({
-            'name': {
-                'noun': 'inventory',
-            },
-            'point_to': 'in your inventory',
-        })
-        for item_uid, item_data in inventory_data.items():
-            item_data['location'] = inventory
-            item = game.object.create(self, item_uid, item_data)
-            self.inventory_add_object(item)
-
-        start_room = data['start_room']
-
-        self.enter(self.rooms[start_room])

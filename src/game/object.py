@@ -42,39 +42,47 @@ class Object:
         ' made no sense to you.'
     ])
 
-    def __init__(self, nar, uid, **kwargs):
+    def __init__(self, nar, uid, data, room=None):
         self.nar = nar
-        self.uid = uid
+        self._uid = uid
 
         self.actions = {}
 
         self.parent = None
 
-        name = kwargs.pop('name', None)
+        name = data.pop('name', None)
         if name is None:
             raise TypeError('object has no name')
         self._name = game.name.create(name)
 
-        short_name = kwargs.pop('short_name', None)
+        short_name = data.pop('short_name', None)
         if short_name is None:
             short_name = self._name
         self._short_name = game.name.create(short_name)
 
-        location = kwargs.pop('location', None)
+        room = data.pop('room', None)
+
+        location = data.pop('location', None)
         if location is None:
             raise TypeError('object {} has no location'.format(uid))
-        self._location = game.location.create(location)
+        if isinstance(location, str):
+            room.get_location(location)
+        else:
+            self._location = location.create(nar)
 
-        kind = kwargs.pop('kind', None)
+        kind = data.pop('kind', None)
         if kind is None:
             kind = self._name.drop_predicates()
         self._kind = game.name.create(kind)
 
-        state = kwargs.pop('state', None)
-        self.state = self.nar.require_uid_state(self.uid, state)
+        state = data.pop('state', None)
+        self.state = self.nar.state().require_uid_state(self._uid, state)
 
-        for key in kwargs:
+        for key in data:
             raise TypeError('got an unexpected argument: {}'.format(key))
+
+    def uid(self):
+        return self._uid
 
     def name(self):
         return self._name
@@ -174,6 +182,6 @@ def create(nar, uid, obj_or_dict):
     if isinstance(obj_or_dict, dict):
         class_name = obj_or_dict.pop('class')
         cls = game.registry.object_classes[class_name]
-        return cls(nar, uid, **obj_or_dict)
+        return cls(nar, uid, obj_or_dict)
     else:
         return obj_or_dict

@@ -11,16 +11,19 @@ import game.name
 
 
 class Location():
-    def __init__(self, **kwargs):
-        name = kwargs.pop('name', None)
+    def __init__(self, data):
+        name = data.pop('name', None)
         if name is None:
             raise TypeError('location has no name')
         self._name = game.name.create(name)
 
-        point_to = kwargs.pop('point_to', None)
+        point_to = data.pop('point_to', None)
         if point_to is None:
             raise TypeError('location has no point_to')
         self._point_to = env.from_string(point_to)
+
+    def create(self, nar):
+        return self
 
     def name(self):
         return self._name
@@ -31,10 +34,3 @@ class Location():
     def __repr__(self):
         out = self._name.default_form([])
         return 'Location<{}>'.format(out)
-
-
-def create(loc):
-    if not isinstance(loc, dict):
-        return loc
-
-    return Location(**loc)

@@ -3,6 +3,7 @@
 names:
   Bowser:
     is_proper: true
+    default_predicate: ignore
     predicates:
       - {kind: compound, word: The Rabbit, prepend: false}
   Cooper:

@@ -13,16 +13,17 @@ from game.predicate import Predicate
 
 
 class Door(Object):
-    def __init__(self, nar, uid, state=None, **kwargs):
-        if 'name' not in kwargs:
-            kwargs['name'] = ObjectName(game.dictionary.nouns['door'])
-        if 'location' not in kwargs:
-            kwargs['location'] = None
-        super().__init__(nar, uid, **kwargs)
+    def __init__(self, nar, uid, data):
+        if 'name' not in data:
+            data['name'] = ObjectName(game.dictionary.nouns['door'])
+        if 'location' not in data:
+            data['location'] = None
+        state = data.pop('state', None)
+        super().__init__(nar, uid, data)
 
         if state is None:
             state = 'closed'
-        self.state['door'] = state
+        self.state['state'] = state
 
         # open
         self.open_closed_replies = Reply([

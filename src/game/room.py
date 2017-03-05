@@ -6,11 +6,10 @@ Created on Sat Feb 11 22:25:01 2017
 """
 
 
+import collections
 import game.dictionary
 from game.object import Object, Container
 from game.reply import Reply
-from game.name import ObjectName
-from game.location import Location
 
 
 def collect(d, k, v):
@@ -24,12 +23,17 @@ def collect(d, k, v):
 class Room(Object):
     _description = '{{ object | namdefl | cap }} was empty.'
 
-    def __init__(self, nar, uid, **kwargs):
-        objects = kwargs.pop('objects', None)
-        doors = kwargs.pop('doors', None)
-        description = kwargs.pop('description', None)
+    def __init__(self, nar, uid, data):
+        objects = data.pop('objects', None)
+        doors = data.pop('doors', None)
+        description = data.pop('description', None)
+        locations = data.pop('locations', {})
 
-        super().__init__(nar, uid, **kwargs)
+        super().__init__(nar, uid, data)
+
+        self._locations = collections.OrderedDict()
+        for loc_id, loc_data in locations.items():
+            self._locations[loc_id] = loc_data.create(nar)
 
         self.objects = Container([self])
         self.doors = Container()
@@ -59,12 +63,14 @@ class Room(Object):
         self.actions['look'] = self.look
 
         if objects is not None:
-            for obj_uid, obj in objects.items():
-                self.add_object(game.object.create(nar, obj_uid, obj))
+            for obj_data in objects:
+                obj = obj_data.create(nar, room=self)
+                self.add_object(obj)
 
         if doors is not None:
-            for door_uid, door in doors.items():
-                self.add_door(game.object.create(nar, door_uid, door))
+            for door_data in doors:
+                door = door_data.create(nar, room=self)
+                self.add_door(door)
 
     def add_object(self, o):
         o.set_parent(self)
@@ -73,6 +79,12 @@ class Room(Object):
     def add_door(self, d):
         d.set_parent(self)
         self.doors.add(d)
+
+    def get_location(self, loc_id):
+        if loc_id == 'room':
+            return self._location
+        else:
+            return self._locations[loc_id]
 
     def find(self, idn):
         try:
