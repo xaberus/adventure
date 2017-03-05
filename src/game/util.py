@@ -12,3 +12,8 @@ def collect(d, k, v):
     a = d[k]
     if v not in a:
         a.append(v)
+
+
+def debug(*args, **kwargs):
+    print(*args, **kwargs)
+    # pass

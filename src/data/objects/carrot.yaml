@@ -1,0 +1,6 @@
+!Object
+  class: Item
+  name: !Name
+    noun: carrot
+  kind:
+    noun: carrot

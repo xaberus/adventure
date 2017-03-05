@@ -7,8 +7,10 @@ Created on Sat Feb 11 22:28:42 2017
 
 import itertools
 import collections
+import game.registry
 from game.reply import Reply, RandomReply
 from game.util import collect
+from game.util import debug
 
 
 class InvalidInteraction(Exception):
@@ -18,52 +20,81 @@ class InvalidInteraction(Exception):
 class Object:
     unknown_replies = RandomReply([
         'You did not knew how to {{ action | inf }}'
-        ' {{ object | predobj }}'
+        ' {{ object | namdefl }}'
         '{% if item %}'
         '{% if action | xprep %} {{ action | xprep }}{% endif %}'
-        ' {{ item | predobj }}'
+        ' {{ item | namdefl }}'
         '{% endif %}'
         '.',
         'You contemplated {{ action | ing }}'
-        ' the {{ object | obj }}'
+        ' {{ object | namdefl }}'
         '{% if item %}'
         '{% if action | xprep %} {{ action | xprep }}{% endif %}'
-        ' {{ item | predobj }}'
+        ' {{ item | namdefl }}'
         '{% endif %},'
         ' but you quickly changed your mind.',
         'At that point in time {{ action | ing }}'
-        ' {{ object | predobj }}'
+        ' {{ object | namdefl }}'
         '{% if item %}'
         '{% if action | xprep %} {{ action | xprep }}{% endif %}'
-        ' {{ item | predobj }}'
+        ' {{ item | namdefl }}'
         '{% endif %}'
         ' made no sense to you.'
     ])
 
-    def __init__(self, nar, uid, pred=None):
+    def __init__(self, nar, uid, **kwargs):
         self.nar = nar
         self.uid = uid
-        self.state = self.nar.require_uid_state(self.uid)
+
         self.actions = {}
-        self.pred = pred
+
         self.parent = None
 
-    def proper_name(self):
-        return False
+        name = kwargs.pop('name', None)
+        if name is None:
+            raise TypeError('object has no name')
+        self._name = game.name.create(name)
+
+        short_name = kwargs.pop('short_name', None)
+        if short_name is None:
+            short_name = self._name
+        self._short_name = game.name.create(short_name)
+
+        location = kwargs.pop('location', None)
+        if location is None:
+            raise TypeError('object {} has no location'.format(uid))
+        self._location = game.location.create(location)
+
+        kind = kwargs.pop('kind', None)
+        if kind is None:
+            kind = self._name.drop_predicates()
+        self._kind = game.name.create(kind)
+
+        state = kwargs.pop('state', None)
+        self.state = self.nar.require_uid_state(self.uid, state)
+
+        for key in kwargs:
+            raise TypeError('got an unexpected argument: {}'.format(key))
 
     def name(self):
-        return 'object'
+        return self._name
 
     def short_name(self):
-        return self.name()
+        return self._short_name
+
+    def kind(self):
+        return self._kind
+
+    def location(self):
+        return self._location
 
     def __repr__(self):
-        n = self.name()
-        sn = self.short_name()
+        n = self._name
+        sn = self._short_name
         if n != sn:
-            return '<{} a.k.a. {}>'.format(sn, n)
+            return 'Object<{} a.k.a. {}>'.format(sn, n)
         else:
-            return '<{}>'.format(sn, n)
+            return 'Object<{}>'.format(sn, n)
 
     def set_parent(self, parent):
         if self.parent is not None:
@@ -97,19 +128,18 @@ class Container():
         self.objects = collections.OrderedDict()
         self.map = {}
 
+        self._register_objects()
+
     def _register_objects(self):
         self.map = {}
 
         for obj in itertools.chain(self.objects.values(), self.extra):
-            idn = tuple(obj.name().split())
-            collect(self.map, idn, obj)
-            idn = tuple(obj.short_name().split())
-            collect(self.map, idn, obj)
-            pred = obj.pred
-            if pred is not None:
-                idn = tuple([obj.pred.name()] + obj.name().split())
+            variants = obj.name().variants()
+            for idn in variants:
                 collect(self.map, idn, obj)
-                idn = tuple([obj.pred.name()] + obj.short_name().split())
+
+            variants = obj.short_name().variants()
+            for idn in variants:
                 collect(self.map, idn, obj)
 
     def __len__(self):
@@ -137,3 +167,13 @@ class Container():
 
     def values(self):
         return self.objects.values()
+
+
+def create(nar, uid, obj_or_dict):
+    debug('[load object]', obj_or_dict)
+    if isinstance(obj_or_dict, dict):
+        class_name = obj_or_dict.pop('class')
+        cls = game.registry.object_classes[class_name]
+        return cls(nar, uid, **obj_or_dict)
+    else:
+        return obj_or_dict

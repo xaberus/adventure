@@ -231,6 +231,8 @@ class Action:
     def ing_form(self):
         return self.verb.ing_form()
 
+    # verb emulatio end
+
     def present_tense(self, negate, form):
         return self.verb.present_tense(negate, form)
 

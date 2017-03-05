@@ -1,0 +1,6 @@
+!Object
+  class: Door
+  name: !Name
+    noun: door
+  kind:
+    noun: door

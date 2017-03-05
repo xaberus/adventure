@@ -7,97 +7,79 @@ Created on Sun Feb 12 13:42:56 2017
 
 
 import jinja2
-
+import game.filter
 
 env = jinja2.Environment()
 
 
-def inf_filter(verb):
-    p = verb.local_prepositions()
-    out = verb.infinitive_form()
-    if len(p) > 0:
-        out = '{} {}'.format(out, p[0])
-    return out.upper()
-env.filters['inf'] = inf_filter
+def cap_filter(s):
+    return s[0].upper + s[1:]
+env.filters['cap'] = cap_filter
+
+env.filters['inf'] = game.filter.inf_filter
+env.filters['ing'] = game.filter.ing_filter
+env.filters['prep'] = game.filter.prep_filter
+env.filters['xprep'] = game.filter.xprep_filter
+env.filters['past'] = game.filter.past_filter
 
 
-def ing_filter(verb):
-    p = verb.local_prepositions()
-    out = verb.ing_form()
+def kind_filter(obj):
+    return obj.kind()
+env.filters['kind'] = kind_filter
 
-    if len(p) > 0:
-        out = '{} {}'.format(out, p[0])
-    return out.upper()
-env.filters['ing'] = ing_filter
-
-
-def prep_filter(verb):
-    return verb.preposition()
-env.filters['prep'] = prep_filter
+env.filters['namsimp'] = game.filter.namsimp_filter
+env.filters['namdefl'] = game.filter.namdefl_filter
+env.filters['namdefn'] = game.filter.namdefn_filter
+env.filters['namindef'] = game.filter.namindef_filter
 
 
-def xprep_filter(verb):
-    p = verb.far_prepositions()
-    if len(p) > 0:
-        return p[0].upper()
-env.filters['xprep'] = xprep_filter
+def location_filter(obj):
+    return obj.location().name()
+env.filters['location'] = location_filter
 
 
-def past_filter(verb, negate=False, form='1sng'):
-    p = verb.local_prepositions()
-    out = verb.past_tense(negate, form)
-    if len(p) > 0:
-        out = '{} {}'.format(out, p[0])
-    return out.upper()
-env.filters['past'] = past_filter
-
-
-def predobj_filter(obj):
-    pred = obj.pred
-    if pred is not None:
-        pred = pred.name()
-        if obj.proper_name():
-            return ('{} {}'.format(pred, obj.name())).upper()
-        else:
-            return ('the {} {}'.format(pred, obj.name())).upper()
-    else:
-        if obj.proper_name():
-            return obj.name().upper()
-        else:
-            return ('the ' + obj.name()).upper()
-env.filters['predobj'] = predobj_filter
-
-
-def obj_filter(obj):
-    return obj.name().upper()
-env.filters['obj'] = obj_filter
-
-
-def pred_filter(obj):
-    pred = obj.pred
-    if pred is not None:
-        pred = pred.name()
-        return pred.upper()
-    return None
-env.filters['pred'] = pred_filter
-
-
-def point_filter(obj):
-    if obj.point_preposition is not None:
-        return obj.point_preposition.upper()
-    return 'in'.upper()
-env.filters['point'] = point_filter
-
-
-def a_filter(s):
-    c = s[0]
-    if c in ('a', 'e', 'i', 'o', 'u'):
-        return 'an'
-    else:
-        return 'a'
-env.filters['a'] = a_filter
-
-
-def debug(*args, **kwargs):
-    # print(*args, **kwargs)
-    pass
+#
+#def predobj_filter(obj):
+#    pred = obj.pred
+#    if pred is not None:
+#        pred = pred.name()
+#        if obj.proper_name():
+#            return ('{} {}'.format(pred, obj.name())).upper()
+#        else:
+#            return ('the {} {}'.format(pred, obj.name())).upper()
+#    else:
+#        if obj.proper_name():
+#            return obj.name().upper()
+#        else:
+#            return ('the ' + obj.name()).upper()
+#env.filters['predobj'] = predobj_filter
+#
+#
+#def obj_filter(obj):
+#    return obj.name().upper()
+#env.filters['obj'] = obj_filter
+#
+#
+#def pred_filter(obj):
+#    pred = obj.pred
+#    if pred is not None:
+#        pred = pred.name()
+#        return pred.upper()
+#    return None
+#env.filters['pred'] = pred_filter
+#
+#
+#def point_filter(obj):
+#    if obj.point_preposition is not None:
+#        return obj.point_preposition.upper()
+#    return 'in'.upper()
+#env.filters['point'] = point_filter
+#
+#
+#def a_filter(s):
+#    c = s[0]
+#    if c in ('a', 'e', 'i', 'o', 'u'):
+#        return 'an'
+#    else:
+#        return 'a'
+#env.filters['a'] = a_filter

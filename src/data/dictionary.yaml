@@ -1,0 +1,80 @@
+#######################################
+
+names:
+  Bowser:
+    is_proper: true
+    predicates:
+      - {kind: compound, word: The Rabbit, prepend: false}
+  Cooper:
+    is_proper: true
+    default_predicate: ignore
+    predicates:
+      - {kind: compound, word: The Rabbit, prepend: false}
+  
+      
+#######################################
+  
+nouns:
+  # rooms
+  inventory:
+  room:
+  balcony:
+  
+  # misc items in rooms
+  plant:
+  
+  # parts of rooms
+  door:
+  
+  # places in rooms
+  fireplace:
+  floor:
+  back:
+  corner:
+  
+  # objects
+  mouse: 
+    plural: mice
+  carrot:
+  rabbit:
+  potion:
+
+#######################################
+  
+adjectives:
+  regular:
+    glass:
+    metal:
+    strange:
+    stubby:
+    short:
+    long:
+    
+  color:
+    black:
+    white:
+    red:
+    orange:
+    yellow:
+    green:
+    blue:
+    cyan:
+    violet:
+    
+  counting:
+    first:
+    second:
+    third:
+    fourth:
+    fifth:
+    sixth:
+    seventh:
+    eighth:
+    nineth:
+    tenth:
+    last:
+   
+  placing:
+    left:
+    right:
+    

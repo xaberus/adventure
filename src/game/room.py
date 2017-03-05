@@ -6,8 +6,11 @@ Created on Sat Feb 11 22:25:01 2017
 """
 
 
+import game.dictionary
 from game.object import Object, Container
 from game.reply import Reply
+from game.name import ObjectName
+from game.location import Location
 
 
 def collect(d, k, v):
@@ -19,14 +22,20 @@ def collect(d, k, v):
 
 
 class Room(Object):
-    description = 'The {{ object | obj }} was empty.'
-    point_preposition = 'in'
+    _description = '{{ object | namdefl | cap }} was empty.'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, nar, uid, **kwargs):
+        objects = kwargs.pop('objects', None)
+        doors = kwargs.pop('doors', None)
+        description = kwargs.pop('description', None)
+
+        super().__init__(nar, uid, **kwargs)
+
         self.objects = Container([self])
         self.doors = Container()
-        self.object_map = {}
+
+        if description is not None:
+            self._description = description
 
         self.common = (
             '\n'
@@ -35,23 +44,27 @@ class Room(Object):
             '{% endif %}'
             '{% if doors | length > 0 %}{% for pos, door in doors.items() %}'
             '\n  {{ pos }}'
-            ' you saw {{ door | obj | a }}'
-            ' {{ door | obj }}'
+            ' you saw {{ door | namdefl }}'
             '{% endfor %}{% endif %}'
         )
 
-        if isinstance(self.description, list):
+        if isinstance(self._description, list):
             self.look_replies = Reply([
                 description + self.common
-                for description in self.description
+                for description in self._description
             ])
         else:
-            self.look_replies = Reply([self.description + self.common])
+            self.look_replies = Reply([self._description + self.common])
 
         self.actions['look'] = self.look
 
-    def name(self):
-        return 'room'
+        if objects is not None:
+            for obj_uid, obj in objects.items():
+                self.add_object(game.object.create(nar, obj_uid, obj))
+
+        if doors is not None:
+            for door_uid, door in doors.items():
+                self.add_door(game.object.create(nar, door_uid, door))
 
     def add_object(self, o):
         o.set_parent(self)
@@ -75,12 +88,14 @@ class Room(Object):
         raise RuntimeError('not implemented yet')
 
     def look(self, data):
-        data['description'] = self.description
+        data['description'] = self._description
         data['objects'] = {}
+        data['room'] = self
         data['doors'] = {
-            door.pred.point_in_room(self): door
+            door.location().point_to(data): door
             for door in self.doors.values()
         }
+        print(data['doors'])
         raise self.look_replies.narrate(data)
 
     def remove_object(self, obj):

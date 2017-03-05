@@ -5,90 +5,95 @@ Created on Sat Feb 11 22:27:10 2017
 @author: xa
 """
 
+import game.dictionary
 from game.predicate import Predicate
 from game.room import Room
 from game.doors import Door, MetalDoor
 from game.object import InvalidInteraction, Object
 from game.reply import Reply
 from game.narrator import Narrator
+from game.name import ObjectName
+from game.location import Location
 
+import game.registry
 
 class Balkony(Room):
     description = (
-        'Your {{ object | obj }} looked like always.'
+        'Your {{ object | namsimp }} looked like always.'
         ' A gentle rustle was the evidence of your two favorite rabbits:'
-        ' Cooper and Boswer.'
+        ' Cooper and Bowser.'
     )
-    point_preposition = 'on'
 
-    def name(self):
-        return 'balkony'
+    def __init__(self, nar, uid, **kwargs):
+        if 'name' not in kwargs:
+            kwargs['name'] = ObjectName(game.dictionary.nouns['balkony'])
+        kwargs['location'] = Location('on {{ room | namdefl }}')
+
+        super().__init__(nar, uid, **kwargs)
 
 
 class Carrot(Object):
-    def __init__(self, *args, name=None, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, nar, uid, **kwargs):
+        pred = kwargs.pop('pred', None)
+        if 'name' not in kwargs:
+            noun = game.dictionary.nouns['carrot']
+            kwargs['name'] = ObjectName(noun, pred=pred)
+        super().__init__(nar, uid, **kwargs)
 
         self.look_replies = Reply([
-            'The {{ object | obj }} was fresh and looked tasty.'
+            '{{ object | namdefn }} was fresh and looked tasty.'
             ' At least if you were a hare or a rabbit.'
             ' For no aparent reason you knew that'
-            ' this was {{ object | predobj }}.'
+            ' this was {{ object | namdefl }}.'
         ])
         self.actions['look'] = self.look_replies
-
-    def name(self):
-        return 'carrot'
-
-    def proper_name(self):
-        return False
 
 
 class Rabbit(Object):
     touch_replies = Reply([
-        '{{ object | obj }} was warm and fluffy to the'
+        '{{ object | namdefl }} was warm and fluffy to the'
         ' {{ action | inf }}.'
     ])
 
     look_hungry_replies = Reply([
-        'You mixed somehing up. {{ object | obj }} was looking at you.'
+        'You mixed somehing up. {{ object | namdefl }} was looking at you.'
         ' You.'
         ' It wanted to be fed.',
-        '{{ object | obj }}, one of your favourite rabbits was looking at you.'
+        '{{ object | namdefl }}, one of your favourite rabbits'
+        ' was looking at you.'
     ])
     look_fed_replies = Reply([
-        '{{ object | obj }} was firmly holding {{ item | predobj }}'
+        '{{ object | namdefl }} was firmly holding {{ item | namdefn }}'
         ' in its tiny paws. It looked happy and for a moment you'
         ' imagened to see a glimpse of gratitude in its eyes.',
-        '{{ object | obj }} was fed and happy. Your attention was not '
+        '{{ object | namdefl }} was fed and happy. Your attention was not '
         'needed anymore.'
     ])
 
     speak_replies = Reply([
-        'You {{ action | past }} {{ object | obj }}. You heared silence.'
+        'You {{ action | past }} {{ object | namdefl }}. You heared silence.'
         ' What did you expect?'
     ])
 
     combine_carrot_replies = Reply([
-        '{{ object | predobj }} snatched {{ item | predobj }} from'
+        '{{ object | namdefl }} snatched {{ item | namdefl }} from'
         ' your hand.',
-        'You gave {{ item | predobj }} to {{ object | predobj }}.'
+        'You gave {{ item | namdefl }} to {{ object | namdefl }}.'
         ' Silently you remarked something about order not having'
         ' a particular meaning.'
     ])
     combine_carrot_fed_replies = Reply([
-        'You almost gave the {{ item | predobj }} to {{ object | predobj }},'
+        'You almost gave the {{ item | namdefl }} to {{ object | namdefl }},'
         ' but a hungry stare stopped you.'
     ])
     combine_else_replies = Reply([
-        '{{ object | predobj }} showed no interest'
-        ' in {{ item | predobj}}.'
+        '{{ object | kind | namdefl }} showed no interest'
+        ' in {{ item | namdefl }}.'
     ])
 
-    def __init__(self, *args, name=None, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, nar, uid, **kwargs):
+        super().__init__(nar, uid, **kwargs)
 
-        self.named = name
         self.state['rabbit'] = 'hungry'
 
         self.actions['touch'] = self.touch_replies
@@ -96,15 +101,6 @@ class Rabbit(Object):
         self.actions['speak'] = self.speak_replies
         self.actions['combine'] = self.combine
         self.actions['apply'] = self.apply
-
-    def name(self):
-        return self.named
-
-    def short_name(self):
-        return 'rabbit'
-
-    def proper_name(self):
-        return True
 
     def look(self, data):
         if self.state['rabbit'] == 'hungry':
@@ -143,7 +139,7 @@ class Rabbit(Object):
         else:
             raise self.combine_else_replies.say(data)
 
-if __name__ == '__main__':
+if __name__ == 'not __main__':
 
     nar = Narrator()
 
@@ -178,7 +174,7 @@ if __name__ == '__main__':
 #    nar.interact('look at cooper')
     nar.interact('give first carrot to cooper')
     nar.interact('give second carrot to cooper')
-    nar.interact('give second carrot to bowser')
+    nar.interact('give bowser second carrot')
 #    nar.interact('look cooper')
 #    nar.interact('look behind cooper')
 #    nar.interact('combine carrot and cooper')
@@ -214,3 +210,35 @@ if __name__ == '__main__':
 #    nar.interact('behold left door')
 #    nar.interact('behold left door')
 #    nar.interact('behold left door')
+
+if __name__ == '__main__':
+    game.registry.register_object_classes(Object)
+
+#    import game.dictionary as gd
+#    from game.word import Compound
+#    from game.predicate import Predicate
+#    from game.location import Location
+
+    nar = Narrator()
+
+    nar.load('level_0.yaml')
+    nar.interact('look')
+    nar.interact('look inventory')
+
+#    r = Balkony(nar, 'balkony')
+#    c = Carrot(nar, 'carrot1', pred=Predicate([
+#        gd.adjectives['counting']['first']
+#    ]), location=Location('on the floor'))
+#    r.add_door(Door(nar, 'balkony_door', location=Location('in the back')))
+#
+#    nar.inventory_add_object(c)
+#    nar.enter(r)
+#
+#    nar.interact('look')
+
+#    nar.inventory_add_object(Carrot(nar, 'carrot1', pred=Predicate('first')))
+#    nar.inventory_add_object(Carrot(nar, 'carrot2', pred=Predicate('second')))
+#    r.add_object(Rabbit(nar, 'bowser', name='bowser'))
+#    r.add_object(Rabbit(nar, 'cooper', name='cooper'))
+#    r.add_door(Door(nar, 'door003', pred=Predicate('back')))
+#    nar.enter(r)

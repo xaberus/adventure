@@ -1,0 +1,15 @@
+!Object
+  class: Door
+  uid: balkony_door
+  name: !Name
+    noun: door
+    default_predicate: compound
+    predicates:
+      - {kind: compound, word: balcony}
+      
+  state:
+    closed: true
+    jammed: false
+    
+  kind:
+    noun: door

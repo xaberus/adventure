@@ -1,0 +1,72 @@
+#######################################
+
+rooms:
+  balcony:
+    class: Room
+    name:
+      noun: balcony
+      
+    description: "Your {{ object | namsimp }} looked like always. A gentle rustle was the evidence of your two favorite rabbits: Cooper and Bowser."
+      
+    location:
+      name:
+        noun: balcony
+      point_to: "at {{ room | namdefl }}"
+      
+    
+    state: {}
+    
+    objects:
+      bowser:
+        class: Rabbit
+        name:
+          subject: true
+          name: Bowser
+          
+        location: 
+          name:
+            noun: corner
+          point_to: "in a corner of {{ room | namdefl }}"
+        
+      cooper:
+        class: Rabbit
+        name:
+          subject: true
+          name: Cooper
+        location: 
+          name:
+            noun: corner
+          point_to: "in a corner of {{ room | namdefl }}"
+          
+    doors:
+      balkony_door:
+        class: Door
+        location:
+          name: 
+            noun: back
+          point_to: "in the back of {{ room | namdefl }}"
+
+#######################################
+          
+inventory:
+  carrot1:
+    class: Object
+    name:
+      noun: carrot
+      default_predicate: regular
+      predicates:
+        - {class: adjective, kind: regular, word: stubby}
+        - {class: adjective, kind: counting, word: first}
+      
+  carrot2:
+    class: Object
+    name:
+      noun: carrot
+      default_predicate: regular
+      predicates: 
+        - {class: adjective, kind: regular, word: long}
+        - {class: adjective, kind: counting, word: second}
+
+#######################################
+      
+start_room: balcony

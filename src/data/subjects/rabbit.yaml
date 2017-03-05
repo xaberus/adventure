@@ -1,0 +1,40 @@
+!Object
+  class: ItemReceiver
+  uid: ~
+  name: !Name
+    noun: rabbit
+  kind:
+    noun: rabbit
+
+  state:
+    received: false
+
+  activate_on:
+    name:
+      noun:
+        carrot
+
+  reply@touch:
+      - "{{ object | namdefl }} was warm and fluffy to the {{ action | inf }}."
+      
+  reply@look:
+      - "You mixed somehing up. {{ object | namdefl }} was looking at you. You. It wanted to be fed."
+      - "{{ object | namdefl }}, one of your favourite rabbits was looking at you. You could tell that it was hungry."
+
+  reply@look@active:
+      - "{{ object | namdefl }} was firmly holding {{ item | namdefn }} in its tiny paws. It looked happy and for a moment you imagened to see a glimpse of gratitude in its eyes."
+      - "{{ object | namdefl }} was fed and happy. Your attention was not needed anymore."
+
+
+  reply@speak:
+      "You {{ action | past }} {{ object | namdefl }}. You heared silence. What did you expect?"
+
+  reply@combine:
+      - "{{ object | namdefl }} snatched {{ item | namdefl }} from your hand."
+      - "You gave {{ item | namdefl }} to {{ object | namdefl }}. Silently you remarked something about order not having a particular meaning."
+
+  reply@combine@active:
+      - "You almost gave the {{ item | namdefl }} to {{ object | namdefl }} but you culd feel a hungry stare lasting on you."
+
+  reply@wrong_item:
+      "{{ object | kind | namdefl }} showed no interest in {{ item | namdefl }}."

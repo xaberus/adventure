@@ -5,15 +5,36 @@ Created on Sat Feb 11 22:22:40 2017
 @author: xa
 """
 
+import os
 import re
+import yaml
 import collections
 import game.verb
+import game.dictionary
+import game.registry
+
+from game.name import ObjectName
 from game.action import InvalidPreposition, Action
-from game.environment import env, debug
-from game.object import InvalidInteraction, Container
+from game.environment import env
+from game.util import debug
+from game.object import InvalidInteraction
 from game.reply import Reply, RandomReply
 from game.reply import NarratorAnswer, NarratorNarration, NarratorComplaint
 from game.room import Room
+from game.location import Location
+
+
+def ordered_load(stream):
+    class OrderedLoader(yaml.Loader):
+        pass
+
+    def construct_mapping(loader, node):
+        loader.flatten_mapping(node)
+        return collections.OrderedDict(loader.construct_pairs(node))
+    OrderedLoader.add_constructor(
+        yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+        construct_mapping)
+    return yaml.load(stream, OrderedLoader)
 
 
 class ParseFailed(Exception):
@@ -37,28 +58,25 @@ class TargetNotUnique(Exception):
 class Inventory(Room):
 
     inventory_empty_replies = Reply([
-        '{{ object | predobj }} was empty.'
+        '{{ object | namdefl }} was empty.'
     ])
 
     inventory_replies = Reply([
-        'You took a look at {{ object | obj }}:'
+        'You took a look in {{ object | namdefl }}:'
         '\n\n'
         '{% for item in objects %}'
-        '  {{ item | predobj }}'
+        '  {{ item | namdefl }}'
         '{% if not loop.last %}\n{% endif %}'
         '{% endfor %}'
     ])
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, nar, uid, **kwargs):
+        name = ObjectName(game.dictionary.nouns['inventory'])
+        kwargs['name'] = name
+        kwargs['location'] = Location(name=name, point_to="in your inventory")
+        super().__init__(nar, uid, **kwargs)
 
         self.actions['look'] = self.look
-
-    def name(self):
-        return 'your inventory'
-
-    def short_name(self):
-        return 'inventory'
 
     def __repr__(self):
         out = []
@@ -83,21 +101,24 @@ class Narrator:
         self.inventory = Inventory(self, 'inventory')
         self.actions = {}
 
+        self.rooms = {}
+
         self.env = env
         self.room = None
+        self.level = None
 
         self.not_unique_reply = Reply([
             'There were more than one'
             '{% for token in tokens %}'
             ' {{ token | upper }}'
             '{% endfor %}'
-            ' {{ room | point }} {{ room | predobj }}.'
+            ' {{ room | location | namdefl }} {{ room | namdefl }}.'
             ' Did you mean{% for target in targets[:-1] %}'
-            ' {{ target| predobj }}{% if not loop.last %},{% endif %}'
+            ' {{ target| namdefl }}{% if not loop.last %},{% endif %}'
             '{%endfor%}'
             '{% for target in targets[-1:] %}'
             ' or'
-            ' {{ target| predobj }}'
+            ' {{ target| namdefl }}'
             '{%endfor%}.'
         ])
 
@@ -107,23 +128,26 @@ class Narrator:
         ])
 
         self.target_not_found_reply = RandomReply([
-            'You tried to {{ action| inf }} the'
+            'You tried to {{ action.verb | inf }} the'
             '{% for token in tokens %}'
             ' {{ token | upper }}'
             '{% endfor %}...'
             ' As there was nothing that looked like '
             '{% for token in tokens %} {{ token | upper }}'
-            '{% endfor %} {{ room | point }} {{ room | predobj }},'
+            '{% endfor %} {{ room | location | namdefl }}'
+            ' {{ room | namdefl }},'
             ' you cried in desperation.',
 
             'In your head you thought about'
-            ' {{ action | ing }} the'
+            ' {{ action | ing }}'
+            '{% if action | prep %}{{ action | prep }}{% endif %}'
+            ' the'
             '{% for token in tokens %}'
             ' {{ token | upper }}'
             '{% endfor %}...'
             ' The problem was that such a thing was nowhere to be found.',
 
-            'You searched {{ room | predobj }}, but you could not find'
+            'You searched {{ room | namdefl }}, but you could not find'
             '{% for token in tokens %} {{ token | upper }}'
             '{% endfor %}.',
 
@@ -143,11 +167,11 @@ class Narrator:
             'Your words had no meaning in that context.'
         ])
 
-        self.actions['utilize'] = self.parse_complex_action
-        self.actions['play'] = self.parse_complex_action
-        self.actions['ramble'] = self.parse_complex_action
+        self.actions['use'] = self.parse_complex_action
+        self.actions['give'] = self.parse_complex_action
 
     def enter(self, room):
+        debug('[enter]', room)
         self.room = room
 
     def find_object(self, action, tokens):
@@ -188,7 +212,7 @@ class Narrator:
         return self.parse_action(action, tokens[1:])
 
     def parse_action(self, action, tokens):
-        base = action.base
+        base = action.verb.base
         if base not in self.actions:
             return self.parse_simple_action(action, tokens)
         else:
@@ -208,6 +232,11 @@ class Narrator:
 
         return action
 
+    def default_complex_preposition(self, action):
+        vbase =action.verb.base
+        if vbase == 'give':
+            return True, 'to'
+
     def parse_complex_action(self, action, tokens):
         preps = action.verb.far_prepositions()
         object_a = None
@@ -220,7 +249,28 @@ class Narrator:
                 break
 
         if split is None:
-            return self.parse_simple_action(action, tokens)
+            found = False
+            for i in range(1, len(tokens) - 1):
+                tokens_a = tokens[0:i]
+                tokens_b = tokens[i:]
+
+                try:
+                    object_a = self.find_object(action, tokens_a)
+                    object_b = self.find_object(action, tokens_b)
+                except:
+                    continue
+                found = True
+                break
+
+            if not found:
+                return self.parse_simple_action(action, tokens)
+
+            reverse, prep = self.default_complex_preposition(action)
+            action.set_far_preposition(prep)
+            if reverse:
+                object_a, object_b = object_b, object_a
+            debug('[complex parse for]', object_a, object_b)
+
         else:
             i = tokens.index(prep)
             action.set_far_preposition(tokens[i])
@@ -304,15 +354,48 @@ class Narrator:
             self.narratives[narrative_id] = {}
         return self.narratives[narrative_id]
 
-    def require_uid_state(self, uid):
+    def require_uid_state(self, uid, state):
+        if state is None:
+            state = {}
+
         m = re.match('[a-z0-9_]+', uid)
         if m is None:
-            raise KeyError('malformed uid')
+            raise KeyError('malformed uid {}'.format(uid))
 
         if uid not in self.state:
-            self.state[uid] = {}
+            self.state[uid] = state
 
         return self.state[uid]
 
     def inventory_add_object(self, obj):
         self.inventory.add_object(obj)
+
+    def load(self, file_name):
+        data_dir = os.path.dirname(__file__)
+        level_path = os.path.join(data_dir,
+                                  '..',
+                                  'data',
+                                  file_name)
+
+        data = ordered_load(open(level_path, 'r'))
+
+        rooms_data = data['rooms']
+        for room_uid, room_data in rooms_data.items():
+            room = game.object.create(self, room_uid, room_data)
+            self.rooms[room_uid] = room
+
+        inventory_data = data['inventory']
+        inventory = game.location.create({
+            'name': {
+                'noun': 'inventory',
+            },
+            'point_to': 'in your inventory',
+        })
+        for item_uid, item_data in inventory_data.items():
+            item_data['location'] = inventory
+            item = game.object.create(self, item_uid, item_data)
+            self.inventory_add_object(item)
+
+        start_room = data['start_room']
+
+        self.enter(self.rooms[start_room])
