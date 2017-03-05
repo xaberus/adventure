@@ -5,28 +5,25 @@ Created on Sun Mar  5 12:58:29 2017
 @author: xa
 """
 
-from game.name import ObjectName
 from game.location import Location
-from game.object import Container
-from game.room import Room
-from game.reply import Reply
+from game.object import Object, Container
 import game.dictionary
 
 
-class Inventory(Room):
+class Inventory(Object):
 
-    inventory_empty_replies = Reply([
-        '{{ object | namdefl }} was empty.'
-    ])
-
-    inventory_replies = Reply([
+    inventory_replies = [
+        '{% if not object.is_empty() %}'
         'In {{ object | namdefl | brk }} you saw:'
         '\n'
-        '{% for item in objects %}'
+        '{% for item in object.objects() %}'
         '  - {{ item | namindef }}'
         '{% if not loop.last %}\n{% endif %}'
         '{% endfor %}'
-    ])
+        '{% else %}'
+        '{{ object | namdefl | cap | brk }} was empty.'
+        '{% endif %}'
+    ]
 
     def __init__(self, nar, uid, data):
         name = game.name.create({
@@ -53,7 +50,8 @@ class Inventory(Room):
                 obj = obj_data.create(nar, room=self)
                 self.add_object(obj)
 
-        self.actions['look'] = self.look
+        self._arm.add_action_reply('reply@look',
+                                   self.inventory_replies)
 
     def __repr__(self):
         out = []
@@ -61,23 +59,21 @@ class Inventory(Room):
             out.append(str(item))
         return '<inventory [{}]>'.format(', '.join(out))
 
-    def look(self, data):
-        if len(self.objects) == 0:
-            raise self.inventory_empty_replies.say(data)
-
-        data['objects'] = self.objects.values()
-
-        raise self.inventory_replies.say(data)
-
     def add_object(self, o):
         o.set_parent(self)
-        self.objects.add(o)
+        self._objects.add(o)
 
     def remove_object(self, obj):
-        self.objects.pop(obj)
+        self._objects.pop(obj)
+
+    def is_empty(self):
+        return len(self._objects) == 0
+
+    def objects(self):
+        return self._objects.values()
 
     def find(self, idn):
-        return self.objects.find(idn)
+        return self._objects.find(idn)
 
     def interact(self, action, target=None):
         if target is None:

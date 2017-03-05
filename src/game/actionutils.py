@@ -76,8 +76,12 @@ class ActionReplyMap:
     RB = pp.Suppress(pp.Literal("]"))
     SL = pp.Suppress(pp.Literal("/"))
     CM = pp.Suppress(pp.Literal(","))
+    PP = pp.Suppress(pp.Literal("|"))
 
     gram = pp.And([
+        pp.Optional(pp.Or([
+            pp.Literal('final'),
+        ]) + PP).setResultsName('mod'),
         pp.Or([
             pp.Literal('reply'),
             pp.Literal('randomreply'),
@@ -112,10 +116,15 @@ class ActionReplyMap:
         else:
             expr = p['bool_expr'][0]
 
-        return head, action, matches, expr
+        if 'mod' not in p:
+            mod = ''
+        else:
+            mod = str(p['mod'])
+
+        return mod, head, action, matches, expr
 
     def add_action_reply(self, spec, reply_data):
-        head, action, matches, expr = self._parse_spec(spec)
+        mod, head, action, matches, expr = self._parse_spec(spec)
         if head == 'reply':
             reply = game.reply.Reply(reply_data)
         elif head == 'randomreply':
@@ -126,29 +135,30 @@ class ActionReplyMap:
         if action not in self._actions:
             self._actions[action] = []
 
-        self._actions[action].append((expr, matches, reply))
+        self._actions[action].append((mod, expr, matches, reply))
 
-    def execute_action(self, action, tag, condition):
+    def execute_action(self, action, tag, conditions):
         base = action.base
 
-        if 'action' in condition:
-            if base == condition['action']:
-                # action matches entry in activation map
-                value = condition.get('value', True)
-                self._state[tag] = value
-                return True
-
-        elif 'item' in condition:
-            cur_item = action.predicate
-            wanted_name = condition['item']['name']
-
-            if cur_item.kind() == wanted_name:
-                value = condition.get('value', True)
-                if self._state[tag] != value:
-                    # execute action only on state change
-                    self._obj.add_object(cur_item)
+        for condition in conditions:
+            if 'action' in condition:
+                if base == condition['action']:
+                    # action matches entry in activation map
+                    value = condition.get('value', True)
                     self._state[tag] = value
-                return True
+                    return True
+
+            elif 'item' in condition:
+                cur_item = action.predicate
+                wanted_name = condition['item']['name']
+
+                if cur_item.kind() == wanted_name:
+                    value = condition.get('value', True)
+                    if self._state[tag] != value:
+                        # execute action only on state change
+                        self._obj.add_object(cur_item)
+                        self._state[tag] = value
+                    return True
 
         return False
 
@@ -160,7 +170,7 @@ class ActionReplyMap:
 
         out = []
         matched = False
-        for expr, matches, reply in self._actions[base]:
+        for mod, expr, matches, reply in self._actions[base]:
             # print(self._state, expr, expr.eval(self._state))
             if expr.eval(self._state):
                 # action matches boolean expression
@@ -169,24 +179,30 @@ class ActionReplyMap:
                     if len(matches) != 1 and matches[0] == '!':
                         continue
 
-                    for tag, condition in self._activation_map.items():
+                    for tag, conditions in self._activation_map.items():
                         if tag in matches:
                             # reply matches entry in activation map
-                            if self.execute_action(action, tag, condition):
+                            if self.execute_action(action, tag, conditions):
                                 out.append(reply.text(data))
                                 matched = True
+                                if mod == 'final':
+                                    break
 
                 else:
                     out.append(reply.text(data))
+                    if mod == 'final':
+                        break
 
         if not matched:
-            for expr, matches, reply in self._actions[base]:
+            for mod, expr, matches, reply in self._actions[base]:
                 if expr.eval(self._state):
                     # action matches boolean expression
                     if len(matches) != 1 or matches[0] != '!':
                         continue
                     # default action
                     out.append(reply.text(data))
+                    if mod == 'final':
+                        break
 
         if len(out) == 0:
             raise game.object.InvalidInteraction()

@@ -46,8 +46,6 @@ class Object:
         self.nar = nar
         self._uid = uid
 
-        self.actions = {}
-
         self.parent = None
 
         name = data.pop('name', None)
@@ -87,9 +85,7 @@ class Object:
 
         keys = data.keys()
         for key in keys:
-            if key.startswith('reply@'):
-                self._arm.add_action_reply(key, data.pop(key))
-            elif key.startswith('randomreply@'):
+            if key.find('@') > 0:
                 self._arm.add_action_reply(key, data.pop(key))
 
         for key in data:

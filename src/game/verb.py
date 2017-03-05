@@ -308,6 +308,9 @@ verbs['open'] = Open()
 class Close(Verb):
     base = 'close'
 
+    def ing_form(self):
+        return "closing"
+
 verbs['close'] = Close()
 
 

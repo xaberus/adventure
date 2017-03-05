@@ -57,7 +57,20 @@ if __name__ == '__main__':
     """
 
     commands = """
+        look inventory
+        pet first rabbit
+        give long carrot to bowser
+        look inventory
+        give carrot to bowser
+        give carrot to cooper
+        look inventory
+        go through door
+
         look door
+        close door
+        close door
+        open door
+        open door
     """
 
 

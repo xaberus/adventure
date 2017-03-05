@@ -12,12 +12,12 @@
 
   activation_map:
     fed:
-      item:
-        name: !Name
-          noun:
-            carrot
+      - item:
+          name: !Name
+            noun:
+              carrot
     happy:
-      action: pet
+      - action: pet
 
   reply@touch:
     - "{{ object | namdefl }} was warm and fluffy to the {{ action | inf }}."
@@ -47,12 +47,12 @@
   reply@pet[happy]:
     - "Now you had {{ object | kind | namsimp | brk }} fur all over youself, but {{ object | kind | namdefl | brk }} was happy."
 
-  randomreply@apply[fed]/!fed:
-    - "{{ object | namdefl | brk }} snatched {{ item | namdefl | brk }} from your hand."
-    - "You gave {{ item | namdefl | brk }} to {{ object | namdefl | brk }}. Silently you remarked something about order not having a particular meaning."
-
   reply@apply[fed]/fed:
     - "You almost gave {{ item | namdefl | brk }} to {{ object | namdefl | brk }} but you could feel a hungry stare lasting on you."
+    
+  final|randomreply@apply[fed]/!fed:
+    - "{{ object | namdefl | brk }} snatched {{ item | namdefl | brk }} from your hand."
+    - "You gave {{ item | namdefl | brk }} to {{ object | namdefl | brk }}. Silently you remarked something about order not having a particular meaning."
 
   reply@apply[!]:
     - "{{ object | kind | namdefl | cap | brk }} showed no interest in {{ item | namdefl | brk }}."

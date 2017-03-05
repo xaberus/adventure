@@ -41,7 +41,7 @@ class Room(Object):
         if description is not None:
             self._description = description
 
-        self.common = (
+        common = (
             '\n'
             '{% if objects | length > 0 %}'
             '<common>'
@@ -53,14 +53,14 @@ class Room(Object):
         )
 
         if isinstance(self._description, list):
-            self.look_replies = Reply([
-                description + self.common
+            look_replies = Reply([
+                description + common
                 for description in self._description
             ])
         else:
-            self.look_replies = Reply([self._description + self.common])
+            look_replies = [self._description + common]
 
-        self.actions['look'] = self.look
+        self._arm.add_action_reply('reply@look', look_replies)
 
         if objects is not None:
             for obj_data in objects:

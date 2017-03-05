@@ -8,9 +8,16 @@
   state:
     closed: false
     jammed: false
-
+    
+  activation_map:
+    closed: 
+      - action: close
+        value: true
+      - action: open
+        value: false
+        
   reply@look:
-    - "You {{ action | past }} a regular {{ object | namsimp | brk }}."
+    - "You {{ action.verb | past | brk }} a regular {{ object | namsimp | brk }}."
     
   reply@look/jammed:
     - "It was jammed shut."
@@ -20,3 +27,74 @@
 
   reply@look/!closed:
     - "{{ object | kind | namdefl | cap | brk }} was open."
+
+  reply@close[closed]/closed:
+    - 'You could not close {{ object | namdefl | brk}} any further, as it was already closed.'
+
+  final|reply@close[closed]/!closed:
+    - 'You closed {{ object | namdefl | brk}}.'
+    
+  reply@open[closed]/!closed&!jammed:
+    - 'You could not open {{ object | namdefl | brk}} any further, as it was already open.'
+
+  final|reply@open[closed]/closed&!jammed:
+    - 'You opened {{ object | namdefl | brk}}.'
+    
+        ## open
+        #self.open_closed_replies = Reply([
+            #'You {{ action | past }} {{ object | namdefl }}.',
+        #])
+        #self.open_open_replies = Reply([
+            #'{{ object | namdefl | cap }} was already open;'
+            #' any attempt to {{ action | inf }} it any more was futile.'
+        #])
+        #self.open_locked_replies = Reply([
+            #'{{ object | namdefl| cap }} was locked,'
+            #' you could not {{ action | inf }} it.',
+            #'You tried to {{ action | inf }}'
+            #' {{ object | namdefl }}, but it still was locked.',
+        #])
+        #self.actions['open'] = self.open
+
+        ## close
+        #self.close_open_replies = Reply([
+            #'You {{ action | past }} {{ object | namdefl }}.',
+        #])
+        #self.close_closed_replies = Reply([
+            #'You could not {{ action | inf }} {{ object | namdefl }}'
+            #' as was already closed.',
+            #'You decided not to {{ action | inf }} {{ object | namdefl }}'
+            #' any further.',
+        #])
+        #self.close_locked_replies = Reply([
+            #'Your attempts to {{ action | inf }} {{ object | namdefl }}'
+            #' were not successfull, as it was locked.',
+        #])
+        #self.actions['close'] = self.close
+
+        #nar = self.nar
+        ## look
+        #self.look_open_replies = NarrativeReply(nar, 'easteregg.doors1', [
+            #'The {{ object | namdefl }} was open.',
+            #'You saw a perfectly normal open {{ object | namsimp }}.',
+        #], [
+            #'A wise man once said: If you stare into the door...',
+            #'the door will stare into you.',
+            #'Or something like this...',
+            #'It is rude to stare!',
+        #])
+        #self.look_closed_replies = NarrativeReply(nar, 'easteregg.doors1', [
+            #'It was just a closed {{ object | namsimp }}.'
+            #' Nothing particular was special about it.'
+        #], [
+            #'You wondered what hid behind {{ object | namdefl }}.',
+            #'It was bigger than a window and smaller than a gate,'
+            #' so, by your definition, it was a door.',
+        #])
+        #self.actions['look'] = self.look
+
+        ## jammed
+        #self.jammed_replies = Reply([
+            #'{{ object | namdefl | cap }} was jammed shut.'
+            #' You could not do anything about it.'
+        #])
