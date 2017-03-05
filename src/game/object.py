@@ -111,10 +111,12 @@ class Object:
         i = '  ' * level
         return i + repr(self)
 
-    def set_parent(self, parent):
+    def set_parent(self, parent, relocate=False):
         if self.parent is not None:
             self.parent.remove_object(self)
         self.parent = parent
+        if relocate:
+            self._location = self.parent.location()
 
     def interact(self, action):
         data = {

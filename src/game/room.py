@@ -90,6 +90,9 @@ class Room(Object):
         o.set_parent(self)
         self.objects.add(o)
 
+    def remove_object(self, obj):
+        self.objects.pop(obj)
+
     def add_door(self, d):
         d.set_parent(self)
         self.doors.add(d)
@@ -128,6 +131,3 @@ class Room(Object):
             for door in self.doors.values()
         }
         raise self.look_replies.narrate(data)
-
-    def remove_object(self, obj):
-        self.objects.pop(obj)

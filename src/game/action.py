@@ -123,6 +123,7 @@ actions_base_map = {
     'take': {None: {None: 'take'}},
     'go': {
         None: {None: 'go'},
+        'through': {None: 'go'},
         'on': {None: 'ramble'},
     },
     'touch': {None: {None: 'touch'}},

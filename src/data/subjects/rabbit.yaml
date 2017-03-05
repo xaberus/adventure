@@ -36,7 +36,7 @@
   reply@look/!happy:
     - "Also, {{ object | namdefl | brk }} wanted to be fondled."
 
-  reply@look/fed,happy:
+  reply@look/fed&happy:
     - "{{ object | namdefl }} was firmly holding {{ item | namdefn | brk }} in its tiny paws. It looked happy and for a moment you imagened to see a glimpse of gratitude in its eyes."
     - "{{ object | namdefl }} was fed and happy. Your attention was not needed anymore."
 
@@ -44,15 +44,15 @@
   reply@speak:
     - "You {{ action | past | brk }} {{ object | namdefl | brk }}. You heared silence. You spoke with {{ object | kind | namindef | brk }}. What did you expect?"
     
-  reply@pet:
-    - "Now you had {{ object | kind | namsimp }} fur all over youself, but {{ object | kind | namdefl }} was happy."
+  reply@pet[happy]:
+    - "Now you had {{ object | kind | namsimp | brk }} fur all over youself, but {{ object | kind | namdefl | brk }} was happy."
 
-  reply@combine:
+  randomreply@apply[fed]/!fed:
     - "{{ object | namdefl | brk }} snatched {{ item | namdefl | brk }} from your hand."
     - "You gave {{ item | namdefl | brk }} to {{ object | namdefl | brk }}. Silently you remarked something about order not having a particular meaning."
 
-  reply@combine/fed:
+  reply@apply[fed]/fed:
     - "You almost gave {{ item | namdefl | brk }} to {{ object | namdefl | brk }} but you could feel a hungry stare lasting on you."
 
-  reply@wrong_item:
-    - "{{ object | kind | namdefl | brk }} showed no interest in {{ item | namdefl | brk }}."
+  reply@apply[!]:
+    - "{{ object | kind | namdefl | cap | brk }} showed no interest in {{ item | namdefl | brk }}."
