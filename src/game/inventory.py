@@ -54,10 +54,22 @@ class Inventory(Object):
                                    self.inventory_replies)
 
     def __repr__(self):
+        cn = self.__class__.__name__
         out = []
-        for item in self.objects:
+        for item in self._objects:
             out.append(str(item))
-        return '<inventory [{}]>'.format(', '.join(out))
+        return '{}<[{}]>'.format(cn, ', '.join(out))
+
+    def dump(self, level=0):
+        out = []
+        i = '  ' * level
+        out.append(i + self.__class__.__name__)
+
+        out.append(i + '  objects:')
+        for _, obj in self._objects.items():
+            out.append(obj.dump(level + 2))
+
+        return '\n'.join(out)
 
     def add_object(self, o):
         o.set_parent(self)

@@ -19,7 +19,6 @@ from game.util import debug
 from game.object import InvalidInteraction
 from game.reply import Reply, RandomReply
 from game.reply import NarratorAnswer, NarratorNarration, NarratorComplaint
-from game.inventory import Inventory
 
 
 def ordered_load(stream):

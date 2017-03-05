@@ -326,6 +326,9 @@ class Take(Verb):
     def far_prepositions(self):
         return ['to']
 
+    def ing_form(self):
+        return "taking"
+
 verbs['take'] = Take()
 
 

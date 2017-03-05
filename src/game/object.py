@@ -43,7 +43,7 @@ class Object:
     ])
 
     def __init__(self, nar, uid, data, room=None):
-        self.nar = nar
+        self._nar = nar
         self._uid = uid
 
         self.parent = None
@@ -68,7 +68,7 @@ class Object:
         if isinstance(location, str):
             self._location = room.get_location(location)
         else:
-            self._location = location.create(nar)
+            self._location = location.create(self._nar)
 
         kind = data.pop('kind', None)
         if kind is None:
@@ -77,7 +77,7 @@ class Object:
         self._kind = kind
 
         state = data.pop('state', None)
-        self._state = self.nar.state().require_uid_state(self._uid, state)
+        self._state = self._nar.state().require_uid_state(self._uid, state)
 
         activation_map = data.pop('activation_map', {})
         self._arm = game.actionutils.ActionReplyMap(self._state,
@@ -107,12 +107,13 @@ class Object:
         return self._location
 
     def __repr__(self):
+        cn = self.__class__.__name__
         n = self._name
         sn = self._short_name
         if n != sn:
-            return 'Object<{} a.k.a. {}>'.format(sn, n)
+            return '{}<{} a.k.a. {}>'.format(cn, sn, n)
         else:
-            return 'Object<{}>'.format(sn, n)
+            return '{}<{}>'.format(cn, sn, n)
 
     def dump(self, level=0):
         i = '  ' * level
@@ -211,7 +212,8 @@ def create(nar, uid, obj_or_dict):
 
 
 class Item(Object):
-    pass
+    def take(self):
+        self._nar.state().inventory_add_object(self)
 
 
 class ItemReceiver(Object):

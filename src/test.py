@@ -9,30 +9,37 @@ import os
 import game
 
 if __name__ == '__main__':
-    game.registry.register_object_classes(game.object.Object)
-
     nar = game.narrator.Narrator()
     data_path = os.path.join(os.path.dirname(__file__), 'data')
     game.state.load(nar, data_path, 'test_0.yaml')
 
-    commands = """
-        look rabbit
-        look inventory
-        pet first rabbit
-        give long carrot to bowser
-        look inventory
-        give carrot to bowser
-        give carrot to cooper
-        look inventory
-        go through door
+    print(nar.state().current_room().dump())
+    print(nar.state().inventory().dump())
 
-        look door
-        close door
-        close door
-        open door
-        open door
-        look door
-        look
+    commands = """
+#        look rabbit
+#        look inventory
+#        pet first rabbit
+#        give long carrot to bowser
+#        look inventory
+#        give carrot to bowser
+#        give carrot to cooper
+#        look inventory
+#        go through door
+#
+#        look door
+#        close door
+#        close door
+#        open door
+#        open door
+#        look door
+#        look
+
+        look inventory
+        look stubby carrot
+        take stubby carrot
+        take stubby carrot
+        look inventory
     """
 
     for cmd in commands.split('\n'):

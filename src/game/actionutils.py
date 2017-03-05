@@ -144,6 +144,10 @@ class ActionReplyMap:
             if 'action' in condition:
                 if base == condition['action']:
                     # action matches entry in activation map
+
+                    if base == 'take':
+                        action.target.take()
+
                     value = condition.get('value', True)
                     self._state[tag] = value
                     return True

@@ -35,8 +35,8 @@ class Room(Object):
         for loc_id, loc_data in locations.items():
             self._locations[loc_id] = loc_data.create(nar)
 
-        self.objects = Container([self])
-        self.doors = Container()
+        self._objects = Container([self])
+        self._doors = Container()
 
         if description is not None:
             self._description = description
@@ -78,24 +78,24 @@ class Room(Object):
         out.append(i + repr(self))
 
         out.append(i + '  objects:')
-        for _, obj in self.objects.items():
+        for _, obj in self._objects.items():
             out.append(obj.dump(level + 2))
         out.append(i + '  doors:')
-        for _, obj in self.doors.items():
+        for _, obj in self._doors.items():
             out.append(obj.dump(level + 2))
 
         return '\n'.join(out)
 
     def add_object(self, o):
         o.set_parent(self)
-        self.objects.add(o)
+        self._objects.add(o)
 
     def remove_object(self, obj):
-        self.objects.pop(obj)
+        self._objects.pop(obj)
 
     def add_door(self, d):
         d.set_parent(self)
-        self.doors.add(d)
+        self._doors.add(d)
 
     def get_location(self, loc_id):
         if loc_id == 'room':
@@ -105,15 +105,15 @@ class Room(Object):
 
     def find(self, idn):
         try:
-            return self.objects.find(idn)
+            return self._objects.find(idn)
         except KeyError:
-            return self.doors.find(idn)
+            return self._doors.find(idn)
 
     def get_by_uid(self, uid):
         try:
-            return self.objects.get_by_uid(uid)
+            return self._objects.get_by_uid(uid)
         except KeyError:
-            return self.doors.get_by_uid(uid)
+            return self._doors.get_by_uid(uid)
 
     def interact(self, action, target=None):
         if target is None:
@@ -129,5 +129,5 @@ class Room(Object):
         data['room'] = self
         data['doors'] = {
             door.location().point_to(data): door
-            for door in self.doors.values()
+            for door in self._doors.values()
         }

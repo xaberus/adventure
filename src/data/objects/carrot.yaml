@@ -4,3 +4,16 @@
     noun: carrot
   kind: !Name
     noun: carrot
+    
+  state:
+    taken: false
+    
+  activation_map:
+    taken:
+      - action: take
+
+  reply@look:
+    - "{{ object | namdefn | cap | brk }} was fresh and looked tasty. At least if you were a hare or a rabbit."
+      
+  reply@take[taken]/!taken:
+    - "You took {{ object | kind | namdefl }}."

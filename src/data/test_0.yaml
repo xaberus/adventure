@@ -1,74 +1,8 @@
 !Game
   rooms:
-    - !Room
-      class: Room
-      uid: balcony
-      name: !Name
-        noun: balcony
-        predicates:
-          - {kind: pronoun, word: your}
-      location: !Location
-        name:
-          noun: balcony
-        point_to: "on {{ room | namdefl | brk }}"
-        
-      description: "{{ object | namdefl | cap }} looked like always. A gentle rustle was the evidence of your two favorite rabbits: {{ room.get_by_uid('cooper') | namdefl | brk }} and {{ room.get_by_uid('bowser') | namdefl | brk }}."
-
-      locations:
-        corner: !Location
-          name: !Name
-            noun: corner
-          point_to: "in a corner"
-        floor: !Location
-          name: !Name
-            noun: floor
-          point_to: "on the floor"
-        back: !Location
-          name: !Name
-            noun: floor
-          point_to: "in the back of {{ room | namdefl | brk }}"
-            
-      objects:
-        - !include
-          path: subjects/rabbit.yaml
-          uid: bowser
-          name: !Name Bowser
-          short_name: !Name
-            noun: rabbit
-            predicates:
-              - {kind: adjective, word: first}
-          location: corner
-
-        - !include
-          path: subjects/rabbit.yaml
-          uid: cooper
-          name: !Name Cooper
-          short_name: !Name
-            noun: rabbit
-            predicates:
-              - {kind: adjective, word: second}
-          location: corner
-
-        - !include
-          path: objects/plant.yaml
-          location: floor
-
-      doors:
-        - !include
-          path: doors/balcony_door.yaml
-          location: back
-
+    - !include rooms/balcony.yaml
 
   inventory: !Inventory
-    - !include
-      path: objects/carrot.yaml
-      uid: carrot1
-      name: !Name
-        noun: carrot
-        predicates:
-          - {kind: adjective, word: stubby}
-          - {kind: adjective, word: second}
-
     - !include
       path: objects/carrot.yaml
       uid: carrot2
