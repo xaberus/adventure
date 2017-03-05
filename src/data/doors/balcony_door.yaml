@@ -1,5 +1,5 @@
-!Object
-  class: Door
+!include
+  path: doors/door.yaml
   uid: balkony_door
   name: !Name
     noun: door
@@ -8,6 +8,3 @@
       - {kind: compound, word: balcony}
            
   state: closed
-    
-  kind:
-    noun: door

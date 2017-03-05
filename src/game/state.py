@@ -9,6 +9,7 @@ Created on Sun Mar  5 13:14:26 2017
 import os
 import re
 import yaml
+import pprint
 import collections
 import game.name
 import game.location
@@ -17,6 +18,7 @@ import game.room
 import game.door
 import game.inventory
 import game.narrator
+from game.util import debug
 
 
 class Proto(collections.OrderedDict):
@@ -53,7 +55,9 @@ class LocationProto(Proto):
 class ObjectProto(Proto):
     def create(self, nar, room=None):
         uid = self.pop('uid', None)
-        uid = nar.state().next_uid()
+        if uid is None:
+            name = self.get('name').simple_form([])
+            uid = nar.state().next_uid(name)
         # pass room whete the object is instantiated
         self['room'] = room
         return game.object.create(nar, uid, self)
@@ -104,10 +108,12 @@ class GameLoader(yaml.Loader):
     def _contruct_name(self, loader, node):
         try:
             data = loader.construct_mapping(node, deep=True)
-            return game.name.create(data)
+            name = game.name.create(data)
+            return name
         except yaml.MarkedYAMLError:
             word = loader.construct_scalar(node)
-            return game.name.names[word]
+            name = game.name.names[word]
+            return name
 
     def _construct_location(self, loader, node):
         return LocationProto(loader.construct_pairs(node, deep=True))
@@ -134,6 +140,7 @@ class State:
         self._state['@narratives'] = {}
         self._narratives = self._state['@narratives']
         self._next_uid = 1
+        self._current_room = None
 
         nar.set_state(self)
 
@@ -150,20 +157,27 @@ class State:
         self._inventory = game.inventory.Inventory(nar, 'inventory',
                                                    inventory_data)
 
-        nar.enter(current_room)
+        self.enter_room(current_room)
 
         for key in data:
             raise TypeError('got an unexpected argument: {}'.format(key))
+
+    def __repr__(self):
+        return pprint.pformat(self._state)
 
     def get_narrative(self, narrative_id):
         if narrative_id not in self._narratives:
             self._narratives[narrative_id] = {}
         return self._narratives[narrative_id]
 
-    def next_uid(self):
+    def next_uid(self, tmpl=None):
+        if tmpl is None:
+            tmpl = 'auto'
+        else:
+            tmpl = '_'.join(tmpl.split()).lower()
         n = self._next_uid
         self._next_uid += 1
-        return 'auto_' + str(n)
+        return '{}_{}'.format(tmpl, n)
 
     def require_uid_state(self, uid, state):
         if state is None:
@@ -178,8 +192,24 @@ class State:
 
         return self._state[uid]
 
+    def inventory(self):
+        return self._inventory
+
     def inventory_add_object(self, obj):
-        self.inventory.add_object(obj)
+        self._inventory.add_object(obj)
+
+    def inventory_find(self, idn):
+        return self._inventory.find(idn)
+
+    def enter_room(self, room):
+        if isinstance(room, str):
+            room = self._rooms[room]
+
+        debug('[enter]', room)
+        self._current_room = room
+
+    def current_room(self):
+        return self._current_room
 
 
 def load(nar, data_path, level_name):

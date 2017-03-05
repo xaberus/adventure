@@ -18,25 +18,28 @@ class InvalidInteraction(Exception):
 
 
 class Object:
+    class Action:
+        pass
+
     unknown_replies = RandomReply([
-        'You did not knew how to {{ action | inf }}'
+        'You did not knew how to {{ action.verb | inf | brk }}'
         ' {{ object | namdefl }}'
         '{% if item %}'
-        '{% if action | xprep %} {{ action | xprep }}{% endif %}'
-        ' {{ item | namdefl }}'
-        '{% endif %}'
-        '.',
-        'You contemplated {{ action | ing }}'
+        '{% if action | xprep %} {{ action.verb | xprep | brk }}{% endif %}'
+        ' {{ item | namdefl }}{% endif %}.',
+
+        'You contemplated {{ action.verb | ing | brk }}'
         ' {{ object | namdefl }}'
         '{% if item %}'
-        '{% if action | xprep %} {{ action | xprep }}{% endif %}'
-        ' {{ item | namdefl }}'
+        '{% if action | xprep %} {{ action.verb | xprep | brk }}{% endif %}'
+        ' {{ item | namdefl | brk }}'
         '{% endif %},'
         ' but you quickly changed your mind.',
-        'At that point in time {{ action | ing }}'
+
+        'At that point in time {{ action.verb | ing | brk }}'
         ' {{ object | namdefl }}'
         '{% if item %}'
-        '{% if action | xprep %} {{ action | xprep }}{% endif %}'
+        '{% if action | xprep %} {{ action | xprep | brk }}{% endif %}'
         ' {{ item | namdefl }}'
         '{% endif %}'
         ' made no sense to you.'
@@ -53,12 +56,14 @@ class Object:
         name = data.pop('name', None)
         if name is None:
             raise TypeError('object has no name')
-        self._name = game.name.create(name)
+        assert isinstance(name, game.name.Name)
+        self._name = name
 
         short_name = data.pop('short_name', None)
         if short_name is None:
             short_name = self._name
-        self._short_name = game.name.create(short_name)
+        assert isinstance(short_name, game.name.Name)
+        self._short_name = short_name
 
         room = data.pop('room', None)
 
@@ -66,14 +71,15 @@ class Object:
         if location is None:
             raise TypeError('object {} has no location'.format(uid))
         if isinstance(location, str):
-            room.get_location(location)
+            self._location = room.get_location(location)
         else:
             self._location = location.create(nar)
 
         kind = data.pop('kind', None)
         if kind is None:
             kind = self._name.drop_predicates()
-        self._kind = game.name.create(kind)
+        assert isinstance(kind, game.name.Name)
+        self._kind = kind
 
         state = data.pop('state', None)
         self.state = self.nar.state().require_uid_state(self._uid, state)
@@ -103,6 +109,10 @@ class Object:
             return 'Object<{} a.k.a. {}>'.format(sn, n)
         else:
             return 'Object<{}>'.format(sn, n)
+
+    def dump(self, level=0):
+        i = '  ' * level
+        return i + repr(self)
 
     def set_parent(self, parent):
         if self.parent is not None:
@@ -150,6 +160,10 @@ class Container():
             for idn in variants:
                 collect(self.map, idn, obj)
 
+            variants = obj.kind().variants()
+            for idn in variants:
+                collect(self.map, idn, obj)
+
     def __len__(self):
         return self.objects.__len__()
 
@@ -162,15 +176,21 @@ class Container():
     def __iter__(self):
         return self.objects.__iter__()
 
+    def items(self):
+        return self.objects.items()
+
     def find(self, idn):
         return self.map[idn]
 
+    def get_by_uid(self, uid):
+        return self.objects[uid]
+
     def add(self, obj):
-        self.objects[obj.uid] = obj
+        self.objects[obj.uid()] = obj
         self._register_objects()
 
     def pop(self, obj):
-        self.objects.pop(obj.uid)
+        self.objects.pop(obj.uid())
         self._register_objects()
 
     def values(self):

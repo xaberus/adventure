@@ -20,16 +20,21 @@ class Inventory(Room):
     ])
 
     inventory_replies = Reply([
-        'You took a look in {{ object | namdefl }}:'
-        '\n\n'
+        'In {{ object | namdefl | brk }} you saw:'
+        '\n'
         '{% for item in objects %}'
-        '  {{ item | namdefl }}'
+        '  - {{ item | namindef }}'
         '{% if not loop.last %}\n{% endif %}'
         '{% endfor %}'
     ])
 
     def __init__(self, nar, uid, data):
-        name = ObjectName(game.dictionary.nouns['inventory'])
+        name = game.name.create({
+            'noun': 'inventory',
+            'predicates': [
+                {'kind': 'pronoun', 'word': 'your'}
+            ]
+        })
         data['name'] = name
         data['location'] = Location({
             'name': name,

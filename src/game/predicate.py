@@ -58,12 +58,15 @@ def create(list_or_pred, default=None):
         if kind == 'adjective':
             word = part.pop('word')
             res = game.dictionary.adjectives[word]
+        elif kind == 'pronoun':
+            word = part.pop('word')
+            res = game.dictionary.pronouns[word]
         elif kind == 'compound':
             word = part.pop('word')
             res = game.word.Compound(word, **part)
-            pred_parts.append(res)
         else:
             raise TypeError('unknown predicate kind `{}`'.format(kind))
+        pred_parts.append(res)
 
     return Predicate(pred_parts, default=default)
 

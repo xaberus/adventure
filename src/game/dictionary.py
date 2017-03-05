@@ -10,6 +10,7 @@ import os
 import yaml
 
 from game.word import Noun
+from game.word import Pronoun
 from game.word import RegularAdjective
 from game.word import ColorAdjective
 from game.word import CountingAdjective
@@ -24,6 +25,7 @@ def load_dictionary():
                                    'dictionary.yaml')
 
     nouns = {}
+    pronouns = {}
     adjectives = {}
 
     data = yaml.load(open(dictionary_path, 'r'))
@@ -32,6 +34,19 @@ def load_dictionary():
         if args is None:
             args = {}
         nouns[noun] = Noun(noun, **args)
+
+    pronoun_map = {
+        'possessive': {'is_possessive': True},
+    }
+
+    for kind, add in pronoun_map.items():
+        for pronoun, args in data['pronouns'][kind].items():
+            if args is None:
+                args = {}
+            for key, value in add.items():
+                if key not in args:
+                    args[key] = value
+            pronouns[pronoun] = Pronoun(pronoun, **args)
 
     adjective_map = {
         'regular': RegularAdjective,
@@ -46,6 +61,8 @@ def load_dictionary():
             adj = adjective_map[kind](adjective, **args)
             adjectives[adjective] = adj
 
-    return nouns, adjectives
+    return nouns, pronouns, adjectives
 
-nouns, adjectives = load_dictionary()
+nouns, pronouns, adjectives = load_dictionary()
+
+print(pronouns)

@@ -41,7 +41,11 @@ nouns:
   potion:
 
 #######################################
-  
+
+pronouns:
+  possessive:
+    your:
+
 adjectives:
   regular:
     glass:

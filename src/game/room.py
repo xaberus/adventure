@@ -48,7 +48,7 @@ class Room(Object):
             '{% endif %}'
             '{% if doors | length > 0 %}{% for pos, door in doors.items() %}'
             '\n  {{ pos }}'
-            ' you saw {{ door | namdefl }}'
+            ' you saw {{ door | namdefl | brk }}'
             '{% endfor %}{% endif %}'
         )
 
@@ -72,6 +72,20 @@ class Room(Object):
                 door = door_data.create(nar, room=self)
                 self.add_door(door)
 
+    def dump(self, level=0):
+        out = []
+        i = '  ' * level
+        out.append(i + repr(self))
+
+        out.append(i + '  objects:')
+        for _, obj in self.objects.items():
+            out.append(obj.dump(level + 2))
+        out.append(i + '  doors:')
+        for _, obj in self.doors.items():
+            out.append(obj.dump(level + 2))
+
+        return '\n'.join(out)
+
     def add_object(self, o):
         o.set_parent(self)
         self.objects.add(o)
@@ -92,6 +106,12 @@ class Room(Object):
         except KeyError:
             return self.doors.find(idn)
 
+    def get_by_uid(self, uid):
+        try:
+            return self.objects.get_by_uid(uid)
+        except KeyError:
+            return self.doors.get_by_uid(uid)
+
     def interact(self, action, target=None):
         if target is None:
             super().interact(action)
@@ -107,7 +127,6 @@ class Room(Object):
             door.location().point_to(data): door
             for door in self.doors.values()
         }
-        print(data['doors'])
         raise self.look_replies.narrate(data)
 
     def remove_object(self, obj):

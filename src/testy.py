@@ -38,3 +38,18 @@ if __name__ == '__main__':
     nar = game.narrator.Narrator()
     data_path = os.path.join(os.path.dirname(__file__), 'data')
     game.state.load(nar, data_path, 'test_0.yaml')
+
+    commands = """
+        look inventory
+        look
+        look robot
+        look rabbit
+        touch first rabbit
+        look second rabbit
+    """
+
+    for cmd in commands.split('\n'):
+        nar.interact(cmd.strip())
+
+    print(nar.state().current_room().dump())
+    print(nar.state().current_room().get_by_uid('bowser').name().variants())

@@ -47,6 +47,9 @@ class Name():
     def variants(self):
         raise NotImplementedError()
 
+    def label(self):
+        return (self.__class__.__name__, tuple(sorted(self.variants())))
+
 
 class ObjectName(Name):
     def __init__(self, noun, pred=None):
@@ -110,6 +113,8 @@ class ObjectName(Name):
         proper = self.noun.is_proper()
         pred = self.predicate(keys)
         if pred is not None:
+            if pred.is_pronoun() and pred.is_possessive():
+                return self.simple_compose(pred.word(), self.noun.word())
             if pred.do_prepend():
                 return self.the_compose(pred.word(), self.noun.word(),
                                         proper=proper)
@@ -127,6 +132,8 @@ class ObjectName(Name):
             compose = self.simple_compose
 
         if pred is not None:
+            if pred.is_pronoun() and pred.is_possessive():
+                compose = self.simple_compose
             if pred.do_prepend():
                 return compose(pred.word(), self.noun.word()).lower()
             else:
@@ -198,6 +205,8 @@ class ProperName(ObjectName):
         raise TypeError('proper names no indefinite forms')
 
 
+_interned_names = {}
+
 def create(data):
     if isinstance(data, str):
         return names[data]
@@ -227,6 +236,14 @@ def create(data):
         raise TypeError('got an unexpected argument: {}'.format(key))
 
     name = cls(noun, pred)
+    l = name.label()
+
+    if l in _interned_names:
+        return _interned_names[l]
+
+    _interned_names[l] = name
+
+    debug('[loaded name]', name, name.variants())
 
     return name
 

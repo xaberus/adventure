@@ -3,7 +3,7 @@
   uid: ~
   name: !Name
     noun: rabbit
-  kind:
+  kind: !Name
     noun: rabbit
 
   state:

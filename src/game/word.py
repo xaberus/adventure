@@ -18,6 +18,16 @@ class Word:
     def kind(self):
         return self._kind
 
+    def do_prepend(self):
+        return True
+
+    def is_pronoun(self):
+        return False
+
+    def __repr__(self):
+        cn = self.__class__.__name__
+        return '{}<{}>'.format(cn, self._word)
+
 
 class Noun(Word):
     def __init__(self, word, kind='noun', **kwargs):
@@ -85,9 +95,6 @@ class Adjective(Word):
     def do_prepend(self):
         return self._do_prepend
 
-    def __repr__(self):
-        return 'Adjective<{}>'.format(self._word)
-
 
 class RegularAdjective(Adjective):
     def __init__(self, word, **kwargs):
@@ -109,6 +116,22 @@ class PlacingAdjective(Adjective):
         super().__init__('placing', word, **kwargs)
 
 
+class Pronoun(Word):
+    def __init__(self, word, kind='pronoun', **kwargs):
+        super().__init__(kind, word)
+
+        self._is_possessive = kwargs.pop('is_possessive', False)
+
+        for key in kwargs:
+            raise TypeError('got an unexpected argument: {}'.format(key))
+
+    def is_pronoun(self):
+        return True
+
+    def is_possessive(self):
+        return self._is_possessive
+
+
 class Compound():
     def __init__(self, description, prepend=True):
         self._description = description
@@ -122,3 +145,6 @@ class Compound():
 
     def do_prepend(self):
         return self._prepend
+
+    def is_pronoun(self):
+        return False

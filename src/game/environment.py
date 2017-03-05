@@ -13,8 +13,12 @@ env = jinja2.Environment()
 
 
 def cap_filter(s):
-    return s[0].upper + s[1:]
+    return s[0].upper() + s[1:]
 env.filters['cap'] = cap_filter
+
+def brk_filter(s):
+    return '[{}]'.format(s)
+env.filters['brk'] = brk_filter
 
 env.filters['inf'] = game.filter.inf_filter
 env.filters['ing'] = game.filter.ing_filter
@@ -33,8 +37,9 @@ env.filters['namdefn'] = game.filter.namdefn_filter
 env.filters['namindef'] = game.filter.namindef_filter
 
 
-def location_filter(obj):
-    return obj.location().name()
+@jinja2.contextfilter
+def location_filter(data, obj):
+    return obj.location().point_to(data)
 env.filters['location'] = location_filter
 
 

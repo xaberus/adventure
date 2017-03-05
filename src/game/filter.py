@@ -14,7 +14,7 @@ def inf_filter(verb):
     out = verb.infinitive_form()
     if len(p) > 0:
         out = '{} {}'.format(out, p[0])
-    return out.upper()
+    return out
 
 
 def ing_filter(verb):
@@ -23,7 +23,7 @@ def ing_filter(verb):
 
     if len(p) > 0:
         out = '{} {}'.format(out, p[0])
-    return out.upper()
+    return out
 
 
 def prep_filter(verb):
@@ -33,7 +33,7 @@ def prep_filter(verb):
 def xprep_filter(verb):
     p = verb.far_prepositions()
     if len(p) > 0:
-        return p[0].upper()
+        return p[0]
 
 
 def past_filter(verb, negate=False, form='1sng'):
@@ -41,7 +41,7 @@ def past_filter(verb, negate=False, form='1sng'):
     out = verb.past_tense(negate, form)
     if len(p) > 0:
         out = '{} {}'.format(out, p[0])
-    return out.upper()
+    return out
 
 
 def namsimp_filter(obj):

@@ -60,61 +60,58 @@ class Narrator:
         self.rooms = {}
 
         self.env = env
-        self.room = None
-        self.level = None
 
         self.not_unique_reply = Reply([
             'There were more than one'
             '{% for token in tokens %}'
-            ' {{ token | upper }}'
+            ' {{ token | brk }}'
             '{% endfor %}'
-            ' {{ room | location | namdefl }} {{ room | namdefl }}.'
+            ' {{ room | location | brk }}.'
             ' Did you mean{% for target in targets[:-1] %}'
-            ' {{ target| namdefl }}{% if not loop.last %},{% endif %}'
+            ' {{ target| namdefl | brk }}'
+            '{% if not loop.last %},{% endif %}'
             '{%endfor%}'
             '{% for target in targets[-1:] %}'
             ' or'
-            ' {{ target| namdefl }}'
+            ' {{ target| namdefl | brk }}'
             '{%endfor%}.'
         ])
 
         self.no_target_reply = Reply([
-            'Your call for {{ action| ing }} was fruitless,'
+            'Your call for {{ action| ing | brk }} was fruitless,'
             ' as it was missing a target.'
         ])
 
         self.target_not_found_reply = RandomReply([
-            'You tried to {{ action.verb | inf }} the'
+            'You tried to {{ action.verb | inf | brk }}'
             '{% for token in tokens %}'
-            ' {{ token | upper }}'
+            ' {{ token | brk }}'
             '{% endfor %}...'
-            ' As there was nothing that looked like '
-            '{% for token in tokens %} {{ token | upper }}'
-            '{% endfor %} {{ room | location | namdefl }}'
-            ' {{ room | namdefl }},'
+            ' As there was nothing that looked like'
+            '{% for token in tokens %} {{ token | brk }}'
+            '{% endfor %} {{ room | location | brk }},'
             ' you cried in desperation.',
 
             'In your head you thought about'
-            ' {{ action | ing }}'
-            '{% if action | prep %}{{ action | prep }}{% endif %}'
+            ' {{ action.verb | ing | brk }}'
             ' the'
             '{% for token in tokens %}'
-            ' {{ token | upper }}'
+            ' {{ token | brk }}'
             '{% endfor %}...'
             ' The problem was that such a thing was nowhere to be found.',
 
-            'You searched {{ room | namdefl }}, but you could not find'
-            '{% for token in tokens %} {{ token | upper }}'
+            'You searched {{ room | namdefl | brk }}, but you could not find'
+            '{% for token in tokens %} {{ token | brk | brk }}'
             '{% endfor %}.',
 
             'You neither possessed not saw anything that reminded you of'
             '{% for token in tokens %}'
-            ' {{ token | upper }}'
+            ' {{ token | brk }}'
             '{% endfor %}.',
 
             'Unfortunately, the fate did not endow you with'
             '{% for token in tokens %}'
-            ' {{ token | upper }}'
+            ' {{ token | brk }}'
             '{% endfor %}.',
         ])
 
@@ -133,19 +130,18 @@ class Narrator:
         return self._state
 
     def enter(self, room):
-        debug('[enter]', room)
-        self.room = room
+        self._state.enter_room(room)
 
     def find_object(self, action, tokens):
         debug('[find object]', action, tokens)
         try:
             idn = tuple(tokens)
             try:
-                target = self.inventory.find(idn)
-                room = self.inventory
+                target = self._state.inventory_find(idn)
+                room = self._state.inventory()
             except KeyError:
-                target = self.room.find(idn)
-                room = self.room
+                target = self._state.current_room().find(idn)
+                room = self._state.current_room()
             if len(target) > 1:
                 raise TargetNotUnique(room, action, tokens, target)
             return target[0]
@@ -156,7 +152,7 @@ class Narrator:
         l = l.lower()
         tokens = l.split()
 
-        if self.room is None:
+        if self._state.current_room() is None:
             raise KeyError('no room')
 
         if len(tokens) >= 1:
@@ -190,7 +186,7 @@ class Narrator:
         if len(tokens) >= 1:
             action.set_target(self.find_object(action, tokens))
         else:
-            action.set_target(self.room)
+            action.set_target(self._state.current_room())
 
         return action
 
@@ -250,6 +246,10 @@ class Narrator:
         return action
 
     def interact(self, l):
+        l = l.strip()
+        if l == '':
+            return
+
         print('> {}'.format(l))
         try:
             try:
@@ -260,7 +260,7 @@ class Narrator:
                 raise self.target_not_found_reply.complain({
                     'action': e.action,
                     'tokens': e.tokens,
-                    'room': self.room,
+                    'room': self._state.current_room(),
                 })
             except TargetNotUnique as e:
                 raise self.not_unique_reply.complain({
@@ -302,13 +302,16 @@ class Narrator:
     def say(self, msg):
         if len(msg) > 0:
             print(msg)
+            print()
 
     def narrate(self, msg):
         if len(msg) > 0:
             print('{narrating} ' + msg)
+            print()
 
     def complain(self, msg):
         if len(msg) > 0:
             print('{complaining} ' + msg)
+            print()
 
 

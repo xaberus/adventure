@@ -16,3 +16,7 @@ import game.inventory
 
 import game.room
 import game.door
+
+import game.util
+
+game.registry.register_object_classes(game.object.Object)
