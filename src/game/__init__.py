@@ -14,6 +14,8 @@ import game.location
 import game.object
 import game.inventory
 
+import game.actionutils
+
 import game.room
 import game.door
 

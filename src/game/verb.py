@@ -336,7 +336,7 @@ class Go(Verb):
         return 'gone'
 
     def local_prepositions(self):
-        return ['to', 'through']
+        return ['through', 'to']
 
 verbs['go'] = Go()
 
