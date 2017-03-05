@@ -52,15 +52,6 @@
         - !include
           path: objects/plant.yaml
           location: floor
-          
-        - !include
-            path: objects/carrot.yaml
-            uid: carrot3
-            name: !Name
-                noun: carrot
-                predicates:
-                  - {kind: adjective, word: red}
-            location: floor
 
       doors:
         - !include

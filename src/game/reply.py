@@ -45,6 +45,10 @@ class Reply:
 
         return next(self.cycle)
 
+    def text(self, data):
+        v = self.choose_reply(data)
+        return v.render(data)
+
     def say(self, data):
         v = self.choose_reply(data)
         return NarratorAnswer(v.render(data))

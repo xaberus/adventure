@@ -6,35 +6,47 @@
   kind: !Name
     noun: rabbit
 
-  state:
-    received: false
+  state: 
+    fed: false
+    happy: false
 
-  activate_on:
-    name: !Name
-      noun:
-        carrot
+  activation_map:
+    fed:
+      item:
+        name: !Name
+          noun:
+            carrot
+    happy:
+        action: pet
 
   reply@touch:
-      - "{{ object | namdefl }} was warm and fluffy to the {{ action | inf }}."
+    - "{{ object | namdefl }} was warm and fluffy to the {{ action | inf }}."
       
   reply@look:
-      - "You mixed somehing up. {{ object | namdefl }} was looking at you. You. It wanted to be fed."
-      - "{{ object | namdefl }}, one of your favourite rabbits was looking at you. You could tell that it was hungry."
+    - "You mixed somehing up. {{ object | namdefl | brk }} was looking at you. You."
+    - "{{ object | namdefl }}, one of your favourite rabbits was looking back at you."
+      
+  reply@look/!fed:
+    - "It wanted to be fed."
+    - " You could tell that it was hungry."
+      
+  reply@look/!happy:
+    - "Also, {{ object | namdefl | brk }} wanted to be fondled."
 
-  reply@look@active:
-      - "{{ object | namdefl }} was firmly holding {{ item | namdefn }} in its tiny paws. It looked happy and for a moment you imagened to see a glimpse of gratitude in its eyes."
-      - "{{ object | namdefl }} was fed and happy. Your attention was not needed anymore."
+  reply@look/fed,happy:
+    - "{{ object | namdefl }} was firmly holding {{ item | namdefn | brk }} in its tiny paws. It looked happy and for a moment you imagened to see a glimpse of gratitude in its eyes."
+    - "{{ object | namdefl }} was fed and happy. Your attention was not needed anymore."
 
 
   reply@speak:
-      "You {{ action | past }} {{ object | namdefl }}. You heared silence. What did you expect?"
+    - "You {{ action | past | brk }} {{ object | namdefl | brk }}. You heared silence. You spoke with {{ object | kind | namindef | brk }}. What did you expect?"
 
   reply@combine:
-      - "{{ object | namdefl }} snatched {{ item | namdefl }} from your hand."
-      - "You gave {{ item | namdefl }} to {{ object | namdefl }}. Silently you remarked something about order not having a particular meaning."
+    - "{{ object | namdefl | brk }} snatched {{ item | namdefl | brk }} from your hand."
+    - "You gave {{ item | namdefl | brk }} to {{ object | namdefl | brk }}. Silently you remarked something about order not having a particular meaning."
 
-  reply@combine@active:
-      - "You almost gave the {{ item | namdefl }} to {{ object | namdefl }} but you culd feel a hungry stare lasting on you."
+  reply@combine/fed:
+    - "You almost gave {{ item | namdefl | brk }} to {{ object | namdefl | brk }} but you could feel a hungry stare lasting on you."
 
   reply@wrong_item:
-      "{{ object | kind | namdefl }} showed no interest in {{ item | namdefl }}."
+    - "{{ object | kind | namdefl | brk }} showed no interest in {{ item | namdefl | brk }}."

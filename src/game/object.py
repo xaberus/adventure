@@ -18,9 +18,6 @@ class InvalidInteraction(Exception):
 
 
 class Object:
-    class Action:
-        pass
-
     unknown_replies = RandomReply([
         'You did not knew how to {{ action.verb | inf | brk }}'
         ' {{ object | namdefl }}'
@@ -82,7 +79,7 @@ class Object:
         self._kind = kind
 
         state = data.pop('state', None)
-        self.state = self.nar.state().require_uid_state(self._uid, state)
+        self._state = self.nar.state().require_uid_state(self._uid, state)
 
         for key in data:
             raise TypeError('got an unexpected argument: {}'.format(key))

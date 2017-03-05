@@ -23,7 +23,7 @@ class Door(Object):
 
         if state is None:
             state = 'closed'
-        self.state['state'] = state
+        self._state['state'] = state
 
         # open
         self.open_closed_replies = Reply([
@@ -85,7 +85,7 @@ class Door(Object):
         ])
 
     def open(self, data):
-        state = self.state['door']
+        state = self._state['door']
         if state == 'closed':
             self.state['door'] = 'open'
             raise self.open_closed_replies.say(data)
@@ -97,7 +97,7 @@ class Door(Object):
             raise self.jammed_replies.say(data)
 
     def close(self, data):
-        state = self.state['door']
+        state = self._state['door']
         if state == 'open':
             self.state['door'] = 'closed'
             raise self.close_open_replies.say(data)
@@ -109,7 +109,7 @@ class Door(Object):
             raise self.jammed_replies.say(data)
 
     def look(self, data):
-        state = self.state['door']
+        state = self._state['door']
         if state == 'open':
             raise self.look_open_replies.narrate(data)
         elif state in ('closed', 'locked', 'jammed'):
