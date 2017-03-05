@@ -134,6 +134,7 @@ class Object:
             'action': action,
             'object': self,
             'item': action.predicate,
+            'inventory': self._nar.state().inventory(),
         }
 
         self.extra_data(data)

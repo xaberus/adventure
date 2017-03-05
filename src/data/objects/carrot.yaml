@@ -14,6 +14,9 @@
 
   reply@look:
     - "{{ object | namdefn | cap | brk }} was fresh and looked tasty. At least if you were a hare or a rabbit."
-      
-  reply@take[taken]/!taken:
-    - "You took {{ object | kind | namdefl }}."
+
+  reply@take[taken]/taken:
+    - "Taking what you already had taken, made no sense to you."
+    
+  final|reply@take[taken]/!taken:
+    - "You took {{ object | kind | namdefl | brk }} and put it in {{ inventory | namdefl | brk }}."
