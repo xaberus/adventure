@@ -18,12 +18,8 @@ class Door(Object):
             data['name'] = ObjectName(game.dictionary.nouns['door'])
         if 'location' not in data:
             data['location'] = None
-        state = data.pop('state', None)
-        super().__init__(nar, uid, data)
 
-        if state is None:
-            state = 'closed'
-        self._state['state'] = state
+        super().__init__(nar, uid, data)
 
         # open
         self.open_closed_replies = Reply([

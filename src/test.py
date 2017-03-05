@@ -7,9 +7,6 @@ Created on Sat Mar  4 23:41:51 2017
 
 import os
 import game
-from game.util import debug
-import pyparsing as pp
-
 
 class Item(game.object.Object):
     pass
@@ -48,9 +45,7 @@ if __name__ == '__main__':
         pet second rabbit
 
         give long carrot to bowser
-    """
 
-    commands = """
         look inventory
         pet first rabbit
         give long carrot to bowser
@@ -61,7 +56,12 @@ if __name__ == '__main__':
         go through door
     """
 
+    commands = """
+        look door
+    """
+
+
     for cmd in commands.split('\n'):
         nar.interact(cmd.strip())
 
-    print(nar.state().current_room().dump())
+

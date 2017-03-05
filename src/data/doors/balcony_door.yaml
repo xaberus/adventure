@@ -7,4 +7,6 @@
     predicates:
       - {kind: compound, word: balcony}
            
-  state: closed
+  #state: 
+    #closed: true
+    #jammed: false

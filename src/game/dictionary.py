@@ -64,5 +64,3 @@ def load_dictionary():
     return nouns, pronouns, adjectives
 
 nouns, pronouns, adjectives = load_dictionary()
-
-print(pronouns)

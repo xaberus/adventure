@@ -4,3 +4,19 @@
     noun: door
   kind: !Name
     noun: door
+    
+  state:
+    closed: false
+    jammed: false
+
+  reply@look:
+    - "You {{ action | past }} a regular {{ object | namsimp | brk }}."
+    
+  reply@look/jammed:
+    - "It was jammed shut."
+
+  reply@look/closed:
+    - "{{ object | kind | namdefl | cap | brk }} was closed."
+
+  reply@look/!closed:
+    - "{{ object | kind | namdefl | cap | brk }} was open."

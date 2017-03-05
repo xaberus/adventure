@@ -249,6 +249,8 @@ class Narrator:
         l = l.strip()
         if l == '':
             return
+        if l.startswith('#'):
+            return
 
         print('> {}'.format(l))
         try:
