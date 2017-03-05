@@ -21,10 +21,13 @@
 
   reply@touch:
     - "{{ object | namdefl }} was warm and fluffy to the {{ action | inf }}."
-      
+  
+  reply@touch/!fed|!happy:
+    - "You culd tell that it was nervous, as if expecting something from you."
+  
   reply@look:
     - "You mixed somehing up. {{ object | namdefl | brk }} was looking at you. You."
-    - "{{ object | namdefl }}, one of your favourite rabbits was looking back at you."
+    - "{{ object | namdefl }}, one of your favourite {{ object | kind | namplural }}, was looking back at you."
       
   reply@look/!fed:
     - "It wanted to be fed."

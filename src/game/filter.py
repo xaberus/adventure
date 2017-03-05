@@ -66,3 +66,9 @@ def namindef_filter(obj):
     if not isinstance(obj, Name):
         obj = obj.name()
     return obj.indefinite_form([])
+
+
+def namplural_filter(obj):
+    if not isinstance(obj, Name):
+        obj = obj.name()
+    return obj.plural_form([])

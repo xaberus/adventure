@@ -7,6 +7,7 @@ Created on Sat Mar  4 23:41:51 2017
 
 import os
 import game
+from pyparsing import infixNotation, opAssoc, Word, alphas
 
 
 class Item(game.object.Object):
@@ -21,6 +22,61 @@ class Item(game.object.Object):
 
 
 class ActionReplyMap:
+    class BoolOperand(object):
+        def __init__(self, t):
+            self.label = t[0]
+
+        def __str__(self):
+            return self.label
+        __repr__ = __str__
+
+        def eval(self, ctx):
+            if self.label in ['True', 'true']:
+                return True
+            elif self.label in ['False', 'false']:
+                return False
+            return ctx[self.label]
+
+    class BoolBinOp(object):
+        def __init__(self, t):
+            self.args = t[0][0::2]
+
+        def __str__(self):
+            sep = " %s " % self.reprsymbol
+            return "(" + sep.join(map(str, self.args)) + ")"
+        __repr__ = __str__
+
+        def eval(self, ctx):
+            return self.evalop(a.eval(ctx) for a in self.args)
+
+    class BoolAnd(BoolBinOp):
+        reprsymbol = '&'
+        evalop = all
+
+    class BoolOr(BoolBinOp):
+        reprsymbol = '|'
+        evalop = any
+
+    class BoolNot(object):
+        def __init__(self, t):
+            self.arg = t[0][1]
+
+        def __str__(self):
+            return "!" + str(self.arg)
+        __repr__ = __str__
+
+        def eval(self, ctx):
+            return not self.arg.eval(ctx)
+
+    boolOperand = Word(alphas)
+    boolOperand.setParseAction(BoolOperand)
+
+    boolExpr = infixNotation(boolOperand, [
+        ("!", 1, opAssoc.RIGHT, BoolNot),
+        ("&", 2, opAssoc.LEFT,  BoolAnd),
+        ("|",  2, opAssoc.LEFT,  BoolOr),
+    ])
+
     def __init__(self, state, activation_map):
         self._state = state
         self._actions = {}
@@ -30,18 +86,15 @@ class ActionReplyMap:
         head, tail = spec.split('@')
         try:
             action, tail = tail.split('/')
-            try:
-                tags = tail.split(',')
-            except ValueError:
-                tags = [tail]
+            expr = self.boolExpr.parseString(tail)[0]
         except ValueError:
             action = tail
-            tags = []
-        return head, action, tuple(tags)
+            expr = self.boolExpr.parseString('True')[0]
+        return head, action, expr
 
     def add_action_reply(self, spec, reply_data):
-        head, action, tags = self._parse_spec(spec)
-        print(action, tags)
+        head, action, expr = self._parse_spec(spec)
+        # print(action, expr)
         if head == 'reply':
             reply = game.reply.Reply(reply_data)
         else:
@@ -50,23 +103,16 @@ class ActionReplyMap:
         if action not in self._actions:
             self._actions[action] = []
 
-        self._actions[action].append((tags, reply))
+        self._actions[action].append((expr, reply))
 
     def handle_action(self, action, data):
-        #print(action, data)
         if action not in self._actions:
             raise game.object.InvalidInteraction()
 
         out = []
-        for tags, reply in self._actions[action]:
-            match = True
-            for tag in tags:
-                if tag[0] == '!':
-                    tag = tag[1:]
-                    match = match and not self._state[tag]
-                else:
-                    match = match and self._state[tag]
-            if match:
+        for expr, reply in self._actions[action]:
+            # print(self._state, expr, expr.eval(self._state))
+            if expr.eval(self._state):
                 out.append(reply.text(data))
         raise game.reply.NarratorAnswer(' '.join(out))
 

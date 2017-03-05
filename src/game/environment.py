@@ -35,6 +35,7 @@ env.filters['namsimp'] = game.filter.namsimp_filter
 env.filters['namdefl'] = game.filter.namdefl_filter
 env.filters['namdefn'] = game.filter.namdefn_filter
 env.filters['namindef'] = game.filter.namindef_filter
+env.filters['namplural'] = game.filter.namplural_filter
 
 
 @jinja2.contextfilter
