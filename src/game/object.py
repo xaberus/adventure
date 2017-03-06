@@ -83,7 +83,7 @@ class Object:
         self._arm = game.actionutils.ActionReplyMap(self._state,
                                                     activation_map, self)
 
-        keys = data.keys()
+        keys = list(data.keys())
         for key in keys:
             if key.find('@') > 0:
                 self._arm.add_action_reply(key, data.pop(key))
