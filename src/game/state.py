@@ -33,7 +33,12 @@ class Proto(collections.OrderedDict):
             for k, v in m.items():
                 if k in d:
                     if isinstance(d[k], dict):
+                        assert isinstance(v, dict)
                         _merge(d[k], v)
+                    elif isinstance(d[k], list):
+                        assert isinstance(v, list)
+                        for u in v:
+                            d[k].append(v)
                     else:
                         d[k] = v
                 else:

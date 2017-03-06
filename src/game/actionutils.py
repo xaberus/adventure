@@ -6,6 +6,7 @@ Created on Sun Mar  5 22:12:30 2017
 """
 
 import pyparsing as pp
+import collections
 import game.object
 import game.reply
 from game.util import debug
@@ -133,9 +134,10 @@ class ActionReplyMap:
             raise ValueError('unknown reply type `{}`'.format(head))
 
         if action not in self._actions:
-            self._actions[action] = []
+            self._actions[action] = collections.OrderedDict()
 
-        self._actions[action].append((mod, expr, matches, reply))
+        # allow action override
+        self._actions[action][spec] = (mod, expr, matches, reply)
 
     def execute_action(self, action, tag, conditions):
         base = action.base
@@ -174,7 +176,7 @@ class ActionReplyMap:
 
         out = []
         matched = False
-        for mod, expr, matches, reply in self._actions[base]:
+        for mod, expr, matches, reply in self._actions[base].values():
             # print(self._state, expr, expr.eval(self._state))
             if expr.eval(self._state):
                 # action matches boolean expression
@@ -198,7 +200,7 @@ class ActionReplyMap:
                         break
 
         if not matched:
-            for mod, expr, matches, reply in self._actions[base]:
+            for mod, expr, matches, reply in self._actions[base].values():
                 if expr.eval(self._state):
                     # action matches boolean expression
                     if len(matches) != 1 or matches[0] != '!':
