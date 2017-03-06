@@ -47,12 +47,18 @@
   reply@pet[happy]:
     - "Now you had {{ object | kind | namsimp | brk }} fur all over yourself, but {{ object | kind | namdefl | brk }} was happy."
 
-  reply@apply[fed]/fed:
+  reply@apply[fed]/fed: &overfeed
     - "You almost gave {{ item | namdefl | brk }} to {{ object | namdefl | brk }}, but you decided not to overfeed it."
     
-  final|randomreply@apply[fed]/!fed:
+  reply@combine[fed]/fed: *overfeed
+    
+  final|randomreply@apply[fed]/!fed: &feed
     - "{{ object | namdefl | brk }} snatched {{ item | namdefl | brk }} from your hand."
     - "You gave {{ item | namdefl | brk }} to {{ object | namdefl | brk }}. Silently you remarked something about order not having a particular meaning."
+    
+  final|randomreply@combine[fed]/!fed: *feed
 
-  reply@apply[!]:
+  reply@apply[!]: &default
     - "{{ object | kind | namdefl | cap | brk }} showed no interest in {{ item | namdefl | brk }}."
+
+  reply@combine[!]: *default

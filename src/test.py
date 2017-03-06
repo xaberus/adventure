@@ -33,13 +33,14 @@ if __name__ == '__main__':
 #        open door
 #        open door
 #        look door
-#        look
+        look
 
         look inventory
         look stubby carrot
         take stubby carrot
         take stubby carrot
         look inventory
+        use long carrot and cooper
     """
 
     for cmd in commands.split('\n'):
