@@ -20,13 +20,13 @@ class InvalidInteraction(Exception):
 class Object:
     unknown_replies = RandomReply([
         'You did not knew how to {{ action.verb | inf | brk }}'
-        ' {{ object | namdefl }}'
+        ' {{ object | namdefl | brk }}'
         '{% if item %}'
         '{% if action | xprep %} {{ action.verb | xprep | brk }}{% endif %}'
-        ' {{ item | namdefl }}{% endif %}.',
+        ' {{ item | namdefl | brk }}{% endif %}.',
 
         'You contemplated {{ action.verb | ing | brk }}'
-        ' {{ object | namdefl }}'
+        ' {{ object | namdefl | brk }}'
         '{% if item %}'
         '{% if action | xprep %} {{ action.verb | xprep | brk }}{% endif %}'
         ' {{ item | namdefl | brk }}'
@@ -34,10 +34,10 @@ class Object:
         ' but you quickly changed your mind.',
 
         'At that point in time {{ action.verb | ing | brk }}'
-        ' {{ object | namdefl }}'
+        ' {{ object | namdefl | brk }}'
         '{% if item %}'
         '{% if action | xprep %} {{ action | xprep | brk }}{% endif %}'
-        ' {{ item | namdefl }}'
+        ' {{ item | namdefl | brk }}'
         '{% endif %}'
         ' made no sense to you.'
     ])

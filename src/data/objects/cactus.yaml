@@ -1,0 +1,7 @@
+!include
+  path: objects/plant.yaml
+  name: !Name
+    noun: cactus
+
+  reply@touch:
+    - "You stinged yourself. Ouch!.. You wondered why you have done this."

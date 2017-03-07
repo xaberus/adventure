@@ -27,20 +27,31 @@ if __name__ == '__main__':
 #        look inventory
 #        go through door
 #
-#        look door
-#        close door
-#        close door
-#        open door
-#        open door
-#        look door
-        look
 
-        look inventory
-        look stubby carrot
-        take stubby carrot
-        take stubby carrot
-        look inventory
-        use long carrot and cooper
+#        look
+
+#        look inventory
+#        look stubby carrot
+#        take stubby carrot
+#        take stubby carrot
+#        look inventory
+#        use long carrot and cooper
+
+#        look door
+#        close door
+#        close door
+#        open door
+#        open door
+#        look door
+
+    #touch cooper
+    #pet cooperb
+
+    look computer
+    look god
+    look natascha
+    touch natascha
+
     """
 
     for cmd in commands.split('\n'):

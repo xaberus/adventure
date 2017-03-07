@@ -50,6 +50,7 @@ def namsimp_filter(obj):
     return obj.simple_form([])
 
 
+# TODO: comment
 def namdefl_filter(obj):
     if not isinstance(obj, Name):
         obj = obj.name()

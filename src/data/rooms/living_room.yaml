@@ -1,0 +1,46 @@
+!Room
+  class: Room
+  uid: living_room
+  name: !Name
+    noun: room
+    predicates:
+      - {kind: compound, word: living}
+
+  location: !Location
+    name: !Name
+        noun: room
+        predicates:
+        - {kind: compound, word: living}
+    point_to: "in {{ room | namdefl | brk }}"
+
+  description: "{{ object | namdefl | cap | brk }} was as lovely as always. Just like you wanted it to be."
+
+  locations:
+    secretary: !Location
+      name: !Name
+        noun: secretary
+      point_to: "on the secretary"
+
+    couch: !Location
+      name: !Name
+        noun: couch
+      point_to: "on the couch"
+
+    right: !Location
+      name: !Name
+        noun: right
+      point_to: "to the right of {{ room | namdefl | brk }}"
+
+  objects:
+    - !include
+      path: objects/computer.yaml
+      location: secretary
+
+    - !include
+      path: subjects/natascha.yaml
+      location: couch
+
+  doors:
+    - !include
+      path: doors/balcony_door.yaml
+      location: right

@@ -11,34 +11,51 @@ names:
     default_predicate: ignore
     predicates:
       - {kind: compound, word: The Rabbit, prepend: false}
-  
-      
+
+  Natascha:
+    is_proper: true
+    default_predicate: ignore
+    predicates:
+      - {kind: compound, word: The One And The Only}
+
 #######################################
-  
+
 nouns:
   # rooms
   inventory:
   room:
   balcony:
-  
+
   # misc items in rooms
   plant:
-  
+
   # parts of rooms
   door:
-  
+
   # places in rooms
   fireplace:
   floor:
   back:
   corner:
-  
+  left:
+  right:
+  couch:
+  secretary:
+
+
   # objects
-  mouse: 
+  mouse:
     plural: mice
   carrot:
   rabbit:
   potion:
+  cactus:
+    plural: cacti
+  computer:
+  laptop:
+
+  # rest
+  god:
 
 #######################################
 
@@ -54,7 +71,7 @@ adjectives:
     stubby:
     short:
     long:
-    
+
   color:
     black:
     white:
@@ -65,7 +82,7 @@ adjectives:
     blue:
     cyan:
     violet:
-    
+
   counting:
     first:
     second:
@@ -78,8 +95,8 @@ adjectives:
     nineth:
     tenth:
     last:
-   
+
   placing:
     left:
     right:
-    
+

@@ -6,11 +6,11 @@
     predicates:
       - {kind: pronoun, word: your}
   location: !Location
-    name:
+    name: !Name
       noun: balcony
     point_to: "on {{ room | namdefl | brk }}"
-    
-  description: "{{ object | namdefl | cap }} looked like always. A gentle rustle was the evidence of your two favorite rabbits: {{ room.get_by_uid('cooper') | namdefl | brk }} and {{ room.get_by_uid('bowser') | namdefl | brk }}."
+
+  description: "{{ object | namdefl | cap | brk }} looked like always. A gentle rustle was the evidence of your two favorite rabbits: {{ room.get_by_uid('cooper') | namdefl | brk }} and {{ room.get_by_uid('bowser') | namdefl | brk }}."
 
   locations:
     corner: !Location
@@ -21,11 +21,11 @@
       name: !Name
         noun: floor
       point_to: "on the floor"
-    back: !Location
+    left: !Location
       name: !Name
-        noun: floor
-      point_to: "in the back of {{ room | namdefl | brk }}"
-        
+        noun: left
+      point_to: "to the left of {{ room | namdefl | brk }}"
+
   objects:
     - !include
       path: subjects/rabbit.yaml
@@ -50,7 +50,11 @@
     - !include
       path: objects/plant.yaml
       location: floor
-      
+
+    - !include
+      path: objects/cactus.yaml
+      location: floor
+
     - !include
       path: objects/carrot.yaml
       uid: carrot1
@@ -64,4 +68,4 @@
   doors:
     - !include
       path: doors/balcony_door.yaml
-      location: back
+      location: left

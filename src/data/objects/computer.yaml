@@ -1,0 +1,17 @@
+!Object
+  class: Object
+  uid: computer
+  name: !Name
+    noun: computer
+  short_name: !Name
+    noun: laptop
+  kind: !Name
+    noun: computer
+
+  state:
+
+  activation_map:
+
+  reply@look:
+    - "{{ object | namdefn | cap | brk }} was humming happiliy. It demanded an interaction with you."
+

@@ -4,3 +4,7 @@
     noun: plant
   kind: !Name
     noun: plant
+
+  randomreply@look:
+    - "You {{ action.verb | past | brk }} a regular {{ object | namsimp | brk }}."
+    - "Your {{ object | namsimp | brk }} looked as ordinary as always."

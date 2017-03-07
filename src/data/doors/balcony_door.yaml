@@ -6,7 +6,7 @@
     default_predicate: compound
     predicates:
       - {kind: compound, word: balcony}
-           
-  #state: 
+
+  #state:
     #closed: true
     #jammed: false

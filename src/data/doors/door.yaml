@@ -4,21 +4,21 @@
     noun: door
   kind: !Name
     noun: door
-    
+
   state:
     closed: false
     jammed: false
-    
+
   activation_map:
-    closed: 
+    closed:
       - action: close
         value: true
       - action: open
         value: false
-        
+
   reply@look:
     - "You {{ action.verb | past | brk }} a regular {{ object | namsimp | brk }}."
-    
+
   reply@look/jammed:
     - "It was jammed shut."
 
@@ -33,13 +33,13 @@
 
   final|reply@close[closed]/!closed:
     - 'You closed {{ object | namdefl | brk}}.'
-    
+
   reply@open[closed]/!closed&!jammed:
     - 'You could not open {{ object | namdefl | brk}} any further, as it was already open.'
 
   final|reply@open[closed]/closed&!jammed:
     - 'You opened {{ object | namdefl | brk}}.'
-    
+
         ## open
         #self.open_closed_replies = Reply([
             #'You {{ action | past }} {{ object | namdefl }}.',

@@ -1,0 +1,22 @@
+!Object
+  class: ItemReceiver
+  uid: natascha
+  name: !Name Natascha
+
+  short_name: !Name
+    noun: god
+
+  state:
+    ringed: true
+
+  reply@look:
+    - "{{ object | namdefl | brk }} looked as beautiful as when you first met her."
+    # narrative reply: it is your wife, dumbass!
+    # dumb action counter +1
+
+  final|reply@touch/ringed:
+    - "{{ object | namdefl | brk }} did not want to be touched, because she wanted you to get the lasagna from the oven first."
+
+  final|reply@touch/!ringed:
+    - "{{ object | namdefl | brk }} did not want to be touched until you had the ring back."
+
