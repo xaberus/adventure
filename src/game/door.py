@@ -10,4 +10,8 @@ from game.object import Object
 
 class Door(Object):
     def __init__(self, nar, uid, data):
+        self.destination = data.pop('destination')
         super().__init__(nar, uid, data)
+
+    def enter(self):
+        self._nar.enter(self.destination)

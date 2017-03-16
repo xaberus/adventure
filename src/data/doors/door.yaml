@@ -1,44 +1,50 @@
 !Object
-  class: Door
-  name: !Name
-    noun: door
-  kind: !Name
-    noun: door
+    class: Door
+    name: !Name
+        noun: door
+    kind: !Name
+        noun: door
 
-  state:
-    closed: false
-    jammed: false
+    state:
+        closed: false
+        jammed: false
+        entered: false
 
-  activation_map:
-    closed:
-      - action: close
-        value: true
-      - action: open
-        value: false
+    activation_map:
+        closed:
+            - action: close
+              value: true
+            - action: open
+              value: false
+        entered:
+            - action: go
 
-  reply@look:
-    - "You {{ action.verb | past | brk }} a regular {{ object | namsimp | brk }}."
+    reply@look:
+        - "You {{ action.verb | past | brk }} a regular {{ object | namsimp | brk }}."
 
-  reply@look/jammed:
-    - "It was jammed shut."
+    reply@look/jammed:
+        - "It was jammed shut."
 
-  reply@look/closed:
-    - "{{ object | kind | namdefl | cap | brk }} was closed."
+    reply@look/closed:
+        - "{{ object | kind | namdefl | cap | brk }} was closed."
 
-  reply@look/!closed:
-    - "{{ object | kind | namdefl | cap | brk }} was open."
+    reply@look/!closed:
+        - "{{ object | kind | namdefl | cap | brk }} was open."
 
-  reply@close[closed]/closed:
-    - 'You could not close {{ object | namdefl | brk}} any further, as it was already closed.'
+    reply@close[closed]/closed:
+        - "You could not close {{ object | namdefl | brk}} any further, as it was already closed."
 
-  final|reply@close[closed]/!closed:
-    - 'You closed {{ object | namdefl | brk}}.'
+    final|reply@close[closed]/!closed:
+        - "You closed {{ object | namdefl | brk}}."
 
-  reply@open[closed]/!closed&!jammed:
-    - 'You could not open {{ object | namdefl | brk}} any further, as it was already open.'
+    reply@open[closed]/!closed&!jammed:
+        - "You could not open {{ object | namdefl | brk}} any further, as it was already open."
 
-  final|reply@open[closed]/closed&!jammed:
-    - 'You opened {{ object | namdefl | brk}}.'
+    final|reply@open[closed]/closed&!jammed:
+        - "You opened {{ object | namdefl | brk}}."
+
+    reply@go[entered]/!closed&!jammed:
+        - "You went through {{ object | namdefl | brk}}."
 
         ## open
         #self.open_closed_replies = Reply([

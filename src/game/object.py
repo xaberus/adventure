@@ -229,3 +229,6 @@ class ItemReceiver(Object):
 
     def remove_object(self, obj):
         self.objects.remove(obj)
+
+    def extra_data(self, data):
+        data['items'] = list(self.objects)

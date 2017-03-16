@@ -69,3 +69,4 @@
     - !include
       path: doors/balcony_door.yaml
       location: left
+      destination: living_room

@@ -149,6 +149,8 @@ class ActionReplyMap:
 
                     if base == 'take':
                         action.target.take()
+                    elif base == 'go':
+                        action.target.enter()
 
                     value = condition.get('value', True)
                     self._state[tag] = value
@@ -165,6 +167,9 @@ class ActionReplyMap:
                         self._obj.add_object(cur_item)
                         self._state[tag] = value
                     return True
+
+            else:
+                raise RuntimeError('unknown condition')
 
         return False
 

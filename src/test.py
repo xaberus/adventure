@@ -47,11 +47,19 @@ if __name__ == '__main__':
     #touch cooper
     #pet cooperb
 
+    open balcony door
+    go through balcony door
+    take stubby carrot
+    give long carrot to bowser
+    fondle bowser
+    look bowser
+
+    go balcony door
+
     look computer
     look god
     look natascha
     touch natascha
-
     """
 
     for cmd in commands.split('\n'):

@@ -1,16 +1,16 @@
 !Game
-  rooms:
-    - !include rooms/balcony.yaml
-    - !include rooms/living_room.yaml
+    rooms:
+        - !include rooms/balcony.yaml
+        - !include rooms/living_room.yaml
 
-  inventory: !Inventory
-    - !include
-      path: objects/carrot.yaml
-      uid: carrot2
-      name: !Name
-        noun: carrot
-        predicates:
-          - {kind: adjective, word: long}
-          - {kind: adjective, word: first}
+    inventory: !Inventory
+        - !include
+            path: objects/carrot.yaml
+            uid: carrot2
+            name: !Name
+                noun: carrot
+                predicates:
+                    - {kind: adjective, word: long}
+                    - {kind: adjective, word: first}
 
-  current_room: living_room
+    current_room: living_room

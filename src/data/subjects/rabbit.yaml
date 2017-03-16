@@ -1,64 +1,63 @@
 !Object
-  class: ItemReceiver
-  uid: ~
-  name: !Name
-    noun: rabbit
-  kind: !Name
-    noun: rabbit
+    class: ItemReceiver
+    uid: ~
+    name: !Name
+        noun: rabbit
+    kind: !Name
+        noun: rabbit
 
-  state:
-    fed: false
-    happy: false
+    state:
+        fed: false
+        happy: false
 
-  activation_map:
-    fed:
-      - item:
-          name: !Name
-            noun:
-              carrot
-    happy:
-      - action: pet
+    activation_map:
+        fed:
+            - item:
+                  name: !Name
+                      noun: carrot
+        happy:
+            - action: pet
 
-  reply@touch:
-    - "{{ object | namdefl }} was warm and fluffy to the {{ action | inf }}."
+    reply@touch:
+        - "{{ object | namdefl }} was warm and fluffy to the {{ action | inf }}."
 
-  reply@touch/!fed|!happy:
-    - "You could tell that it was nervous, as if expecting something from you."
+    reply@touch/!fed|!happy:
+        - "You could tell that it was nervous, as if expecting something from you."
 
-  reply@look:
-    - "You mixed somehing up. {{ object | namdefl | brk }} was looking at you. You."
-    - "{{ object | namdefl }}, one of your favourite {{ object | kind | namplural }}, was looking back at you."
+    reply@look:
+        - "You mixed somehing up. {{ object | namdefl | brk }} was looking at you. You."
+        - "{{ object | namdefl }}, one of your favourite {{ object | kind | namplural }}, was looking back at you."
 
-  reply@look/!fed:
-    - "It wanted to be fed."
-    - " You could tell that it was hungry."
+    reply@look/!fed:
+        - "It wanted to be fed."
+        - " You could tell that it was hungry."
 
-  reply@look/!happy:
-    - "Also, {{ object | namdefl | brk }} wanted to be fondled."
+    reply@look/!happy:
+        - "Also, {{ object | namdefl | brk }} wanted to be fondled."
 
-  reply@look/fed&happy:
-    - "{{ object | namdefl }} was firmly holding {{ item | namdefn | brk }} in its tiny paws. It looked happy and for a moment you imagened to see a glimpse of gratitude in its eyes."
-    - "{{ object | namdefl }} was fed and happy. Your attention was not needed anymore."
+    reply@look/fed&happy:
+        - "{{ object | kind | namdefn | cap | brk }} looked happy as it was firmly holding {{ items[0] | namdefn | brk }} in its tiny paws and for a moment you imagened to see a glimpse of gratitude in its eyes."
+        - "It was fed and happy. Your attention was not needed anymore."
 
 
-  reply@speak:
-    - "You {{ action | past | brk }} {{ object | namdefl | brk }}. You heared silence. You spoke with {{ object | kind | namindef | brk }}. What did you expect?"
+    reply@speak:
+        - "You {{ action | past | brk }} {{ object | namdefl | brk }}. You heared silence. You spoke with {{ object | kind | namindef | brk }}. What did you expect?"
 
-  reply@pet[happy]:
-    - "Now you had {{ object | kind | namsimp | brk }} fur all over yourself, but {{ object | kind | namdefl | brk }} was happy."
+    reply@pet[happy]:
+        - "Now you had {{ object | kind | namsimp | brk }} fur all over yourself, but {{ object | kind | namdefl | brk }} was happy."
 
-  reply@apply[fed]/fed: &overfeed
-    - "You almost gave {{ item | namdefl | brk }} to {{ object | namdefl | brk }}, but you decided not to overfeed it."
+    reply@apply[fed]/fed: &overfeed
+        - "You almost gave {{ item | namdefl | brk }} to {{ object | namdefl | brk }}, but you decided not to overfeed it."
 
-  reply@combine[fed]/fed: *overfeed
+    reply@combine[fed]/fed: *overfeed
 
-  final|randomreply@apply[fed]/!fed: &feed
-    - "{{ object | namdefl | brk }} snatched {{ item | namdefl | brk }} from your hand."
-    - "You gave {{ item | namdefl | brk }} to {{ object | namdefl | brk }}. Silently you remarked something about order not having a particular meaning."
+    final|randomreply@apply[fed]/!fed: &feed
+        - "{{ object | namdefl | brk }} snatched {{ item | namdefl | brk }} from your hand."
+        - "You gave {{ item | namdefl | brk }} to {{ object | namdefl | brk }}. Silently you remarked something about order not having a particular meaning."
 
-  final|randomreply@combine[fed]/!fed: *feed
+    final|randomreply@combine[fed]/!fed: *feed
 
-  reply@apply[!]: &default
-    - "{{ object | kind | namdefl | cap | brk }} showed no interest in {{ item | namdefl | brk }}."
+    reply@apply[!]: &default
+        - "{{ object | kind | namdefl | cap | brk }} showed no interest in {{ item | namdefl | brk }}."
 
-  reply@combine[!]: *default
+    reply@combine[!]: *default
